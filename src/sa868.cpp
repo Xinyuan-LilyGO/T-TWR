@@ -7,14 +7,18 @@
 
 SA868::SA868(Stream& stream, uint8_t pttPin, uint8_t pdPin, uint8_t rfPin) {
     _stream = &stream;
-    this->_pttPin = pttPin;
-    this->_pdPin = pdPin;
+    _pttPin = pttPin;
+    _pdPin = pdPin;
+    _rfPin = rfPin;
 
-    pinMode(this->_pttPin, OUTPUT);
-    digitalWrite(this->_pttPin, HIGH);
+    pinMode(_pttPin, OUTPUT);
+    digitalWrite(_pttPin, HIGH);
 
-    pinMode(this->_pdPin, OUTPUT);
-    digitalWrite(this->_pdPin, LOW);
+    pinMode(_pdPin, OUTPUT);
+    digitalWrite(_pdPin, LOW);
+
+    pinMode(_rfPin, OUTPUT);
+    digitalWrite(_rfPin, LOW);
 }
 
 
@@ -22,12 +26,15 @@ SA868::SA868(Stream& stream, uint8_t pttPin, uint8_t pdPin, uint8_t rfPin) {
  * destructor
  */
 SA868::~SA868() {
-    this->_stream->flush();
+    _stream->flush();
 }
 
 
 void SA868::begin() {
-    digitalWrite(this->_pdPin, HIGH);
+    digitalWrite(_pdPin, HIGH);
+    delay(1000);
+    _transmitStatus = false;
+    digitalWrite(_pttPin, HIGH);
 }
 
 

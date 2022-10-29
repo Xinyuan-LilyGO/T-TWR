@@ -239,6 +239,8 @@ public:
      */
     bool setFilter(bool emphasis, bool highPass, bool lowPass);
 
+    bool checkFreq(bool bandwidth, double freq);
+
     bool    bandwidth;
     double  transFreq;
     double  recvFreq;
@@ -253,7 +255,7 @@ public:
 
 private:
     bool waitResponse(String& data, String rsp = "\r\n", uint32_t timeout = 1000);
-    bool checkFreq(bool bandwidth, double freq);
+
 protected:
     Stream *_stream;
     uint8_t _pttPin = 0;

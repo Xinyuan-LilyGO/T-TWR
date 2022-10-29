@@ -133,16 +133,16 @@ void data_save(SA868 &sa868) {
         Serial.println(F(INFO_TAG"nvs open error"));
     }
 
-    doc["band"]["bandwidth"] = sa868.bandwidth;
-    doc["band"]["transFreq"] = sa868.transFreq;
-    doc["band"]["recvFreq"] = sa868.recvFreq;
-    doc["band"]["txCXCSS"] = sa868.txCXCSS;
-    doc["band"]["sq"] = sa868.sq;
-    doc["band"]["rxCXCSS"] = sa868.rxCXCSS;
-    doc["volume"] = sa868.volume;
+    doc["band"]["bandwidth"]  = sa868.bandwidth;
+    doc["band"]["transFreq"]  = sa868.transFreq;
+    doc["band"]["recvFreq"]   = sa868.recvFreq;
+    doc["band"]["txCXCSS"]    = sa868.txCXCSS;
+    doc["band"]["sq"]         = sa868.sq;
+    doc["band"]["rxCXCSS"]    = sa868.rxCXCSS;
+    doc["volume"]             = sa868.volume;
     doc["filter"]["emphasis"] = sa868.emphasis;
     doc["filter"]["highPass"] = sa868.highPass;
-    doc["filter"]["lowPass"] = sa868.lowPass;
+    doc["filter"]["lowPass"]  = sa868.lowPass;
 
     serializeJson(doc, str, sizeof(str) - 1);
 

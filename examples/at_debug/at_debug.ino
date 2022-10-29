@@ -1,12 +1,5 @@
+#include "pin.h"
 #include <Arduino.h>
-
-#define CONFIG_SA868_TX_PIN   47
-#define CONFIG_SA868_RX_PIN   48
-#define CONFIG_SA868_PTT_PIN  41
-#define CONFIG_SA868_PD_PIN   40
-#define CONFIG_SA868_RF_PIN   39
-
-#define CONFIG_BUTTON_PTT_PIN 38
 
 // Set serial for debug console (to the Serial Monitor, default speed 115200)
 #define SerialMon Serial
@@ -20,6 +13,9 @@ void setup() {
 
     pinMode(CONFIG_SA868_PTT_PIN, OUTPUT);
     digitalWrite(CONFIG_SA868_PTT_PIN, LOW);
+
+    pinMode(CONFIG_SA868_RF_PIN, OUTPUT);
+    digitalWrite(CONFIG_SA868_RF_PIN, LOW);
 
     pinMode(CONFIG_BUTTON_PTT_PIN, INPUT);
 
@@ -43,9 +39,9 @@ void loop() {
 void buttonTask(void *pvParameters) {
     while (1) {
         if (digitalRead(CONFIG_BUTTON_PTT_PIN)) {
-            digitalWrite(CONFIG_SA868_PTT_PIN, LOW);
-        } else {
             digitalWrite(CONFIG_SA868_PTT_PIN, HIGH);
+        } else {
+            digitalWrite(CONFIG_SA868_PTT_PIN, LOW);
         }
         delay(10);
     }

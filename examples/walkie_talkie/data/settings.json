@@ -1,8 +1,8 @@
 {
     "band": {
         "bandwidth": false,
-        "transFreq": 415.1250,
-        "recvFreq": 415.1250,
+        "transFreq": 134.0,
+        "recvFreq": 134.0,
         "txCXCSS": 0,
         "sq": 4,
         "rxCXCSS": 0

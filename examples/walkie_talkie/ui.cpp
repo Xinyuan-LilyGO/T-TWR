@@ -2,13 +2,14 @@
 #include <U8g2lib.h>
 
 #define CONFIG_DEFAULT_FONT u8g2_font_open_iconic_all_4x_t
-#define CONFIG_DISP_W (64)
-#define CONFIG_DISP_H (128)
+#define CONFIG_DISP_W (128)
+#define CONFIG_DISP_H (64)
 
 // head
-#define CONFIG_RSSI_FONT           u8g2_font_waffle_t_all
-#define CONFIG_RSSI_X              (0)
-#define CONFIG_RSSI_Y              (0)
+// https://github.com/olikraus/u8g2/wiki/fntgrpsiji
+#define CONFIG_RSSI_FONT           u8g2_font_siji_t_6x10 // u8g2_font_waffle_t_all
+#define CONFIG_RSSI_X              (96)
+#define CONFIG_RSSI_Y              (16)
 #define CONFIG_RSSI_W              (CONFIG_RSSI_MARGIN_LEFT + \
                                     CONFIG_RSSI_BORDER_LEFT + \
                                     CONFIG_RSSI_PADDING_LEFT + \
@@ -44,10 +45,10 @@
                                     CONFIG_RSSI_BORDER_TOP + \
                                     CONFIG_RSSI_PADDING_TOP + \
                                     CONFIG_RSSI_CONTENT_H)
-#define CONFIG_RSSI_CONTENT_W      (16)
+#define CONFIG_RSSI_CONTENT_W      (32)
 #define CONFIG_RSSI_CONTENT_H      (16)
 
-#define CONFIG_VOLUME_FONT           u8g2_font_waffle_t_all
+#define CONFIG_VOLUME_FONT           u8g2_font_open_iconic_all_1x_t
 #define CONFIG_VOLUME_X              (CONFIG_RSSI_X + CONFIG_RSSI_W)
 #define CONFIG_VOLUME_Y              (CONFIG_RSSI_Y)
 #define CONFIG_VOLUME_W              (CONFIG_VOLUME_MARGIN_LEFT + \
@@ -131,7 +132,7 @@
 
 // main page
 #define CONFIG_MAIN_PAGE_X (0)
-#define CONFIG_MAIN_PAGE_Y (18)
+#define CONFIG_MAIN_PAGE_Y (0)
 #define CONFIG_MAIN_PAGE_W (64)
 #define CONFIG_MAIN_PAGE_H (110)
 
@@ -173,8 +174,8 @@
 
 // transmit status
 #define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_FONT           u8g2_font_open_iconic_all_4x_t
-#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X              (CONFIG_MAIN_PAGE_CONTENT_X)
-#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y              (CONFIG_MAIN_PAGE_CONTENT_Y)
+#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X              (32)
+#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y              (0)
 #define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_W              (CONFIG_MAIN_PAGE_TRANSMIT_STATUS_MARGIN_LEFT + \
                                                          CONFIG_MAIN_PAGE_TRANSMIT_STATUS_BORDER_LEFT + \
                                                          CONFIG_MAIN_PAGE_TRANSMIT_STATUS_PADDING_LEFT + \
@@ -210,13 +211,13 @@
                                                          CONFIG_MAIN_PAGE_TRANSMIT_STATUS_BORDER_TOP + \
                                                          CONFIG_MAIN_PAGE_TRANSMIT_STATUS_PADDING_TOP + \
                                                          CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_H)
-#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_W      (32)
-#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_H      (32)
+#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_W      (64)
+#define CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_H      (64)
 
 // settings menu
 #define CONFIG_SETTINGS_MENU_FONT           u8g2_font_open_iconic_embedded_2x_t
 #define CONFIG_SETTINGS_MENU_X              (CONFIG_MAIN_PAGE_X)
-#define CONFIG_SETTINGS_MENU_Y              (CONFIG_MAIN_PAGE_Y + CONFIG_MAIN_PAGE_TRANSMIT_STATUS_H)
+#define CONFIG_SETTINGS_MENU_Y              (CONFIG_MAIN_PAGE_Y)
 #define CONFIG_SETTINGS_MENU_W              (CONFIG_SETTINGS_MENU_MARGIN_LEFT + \
                                              CONFIG_SETTINGS_MENU_BORDER_LEFT + \
                                              CONFIG_SETTINGS_MENU_PADDING_LEFT + \
@@ -231,7 +232,7 @@
                                              CONFIG_SETTINGS_MENU_PADDING_BOTTOM + \
                                              CONFIG_SETTINGS_MENU_BORDER_BOTTOM + \
                                              CONFIG_SETTINGS_MENU_MARGIN_BOTTOM)
-#define CONFIG_SETTINGS_MENU_MARGIN_TOP     (22) // margin top
+#define CONFIG_SETTINGS_MENU_MARGIN_TOP     (0) // margin top
 #define CONFIG_SETTINGS_MENU_MARGIN_BOTTOM  (0) // margin buttom
 #define CONFIG_SETTINGS_MENU_MARGIN_LEFT    (0) // margin left
 #define CONFIG_SETTINGS_MENU_MARGIN_RIGHT   (0) // margin right
@@ -258,8 +259,8 @@
 
 // filter menu
 #define CONFIG_FILTER_MENU_FONT           u8g2_font_open_iconic_embedded_2x_t
-#define CONFIG_FILTER_MENU_X              (CONFIG_SETTINGS_MENU_X + CONFIG_SETTINGS_MENU_W)
-#define CONFIG_FILTER_MENU_Y              (CONFIG_SETTINGS_MENU_Y)
+#define CONFIG_FILTER_MENU_X              (CONFIG_SETTINGS_MENU_X)
+#define CONFIG_FILTER_MENU_Y              (CONFIG_SETTINGS_MENU_Y + CONFIG_SETTINGS_MENU_H)
 #define CONFIG_FILTER_MENU_W              (CONFIG_FILTER_MENU_MARGIN_LEFT + \
                                            CONFIG_FILTER_MENU_BORDER_LEFT + \
                                            CONFIG_FILTER_MENU_PADDING_LEFT + \
@@ -274,7 +275,7 @@
                                            CONFIG_FILTER_MENU_PADDING_BOTTOM + \
                                            CONFIG_FILTER_MENU_BORDER_BOTTOM + \
                                            CONFIG_FILTER_MENU_MARGIN_BOTTOM)
-#define CONFIG_FILTER_MENU_MARGIN_TOP     (22) // margin top
+#define CONFIG_FILTER_MENU_MARGIN_TOP     (0) // margin top
 #define CONFIG_FILTER_MENU_MARGIN_BOTTOM  (0) // margin buttom
 #define CONFIG_FILTER_MENU_MARGIN_LEFT    (0) // margin left
 #define CONFIG_FILTER_MENU_MARGIN_RIGHT   (0) // margin right
@@ -302,9 +303,9 @@
 // settings page
 #define CONFIG_SETTINGS_PAGE_FONT                u8g2_font_nokiafc22_tr
 #define CONFIG_SETTINGS_PAGE_X                   (0)
-#define CONFIG_SETTINGS_PAGE_Y                   (18)
-#define CONFIG_SETTINGS_PAGE_W                   (64)
-#define CONFIG_SETTINGS_PAGE_H                   (110)
+#define CONFIG_SETTINGS_PAGE_Y                   (0)
+#define CONFIG_SETTINGS_PAGE_W                   (128)
+#define CONFIG_SETTINGS_PAGE_H                   (64)
 
 // title
 #define CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_FONT       u8g2_font_nokiafc22_tr
@@ -574,14 +575,47 @@
 // filter page
 #define CONFIG_FILTER_PAGE_FONT u8g2_font_nokiafc22_tr
 #define CONFIG_FILTER_PAGE_X    (0)
-#define CONFIG_FILTER_PAGE_Y    (18)
-#define CONFIG_FILTER_PAGE_W    (64)
-#define CONFIG_FILTER_PAGE_H    (112)
+#define CONFIG_FILTER_PAGE_Y    (0)
+#define CONFIG_FILTER_PAGE_W    (128)
+#define CONFIG_FILTER_PAGE_H    (64)
+
+// title
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BOX_FONT       u8g2_font_nokiafc22_tr
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BOX_X          (CONFIG_FILTER_PAGE_X)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BOX_Y          (CONFIG_FILTER_PAGE_Y)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BOX_W          (CONFIG_FILTER_PAGE_W)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BOX_H          (CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_H + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_BOTTOM + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_BOTTOM + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_BOTTOM)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_TOP     (1)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_BOTTOM  (1)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_LEFT    (1)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_RIGHT   (1)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_TOP     (0)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_BOTTOM  (1)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_LEFT    (0)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_RIGHT   (0)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_TOP    (2)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_BOTTOM (2)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_LEFT   (2)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_RIGHT  (2)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_X         (CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_LEFT)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_Y         (CONFIG_FILTER_PAGE_BAR_TITLE_BOX_Y + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_MARGIN_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_BORDER_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_PADDING_TOP + \
+                                                     CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_H)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_W         (8)
+#define CONFIG_FILTER_PAGE_BAR_TITLE_TEXT_H         (8)
 
 // bar1
 #define CONFIG_FILTER_PAGE_FONT                u8g2_font_nokiafc22_tr
 #define CONFIG_FILTER_PAGE_BAR1_BOX_X          (0)
-#define CONFIG_FILTER_PAGE_BAR1_BOX_Y          (CONFIG_FILTER_PAGE_Y)
+#define CONFIG_FILTER_PAGE_BAR1_BOX_Y          (CONFIG_FILTER_PAGE_BAR_TITLE_BOX_Y + CONFIG_FILTER_PAGE_BAR_TITLE_BOX_H)
 #define CONFIG_FILTER_PAGE_BAR1_BOX_W          (CONFIG_DISP_W)
 #define CONFIG_FILTER_PAGE_BAR1_BOX_H          (CONFIG_FILTER_PAGE_BAR1_MARGIN_TOP + \
                                                 CONFIG_FILTER_PAGE_BAR1_BORDER_TOP + \
@@ -696,65 +730,128 @@
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 
 void feedVolume(uint8_t volume) {
-    u8g2.setFont(CONFIG_VOLUME_FONT);
-    CLEAR_AREA(CONFIG_VOLUME_X,
-               CONFIG_VOLUME_Y,
-               CONFIG_VOLUME_W,
-               CONFIG_VOLUME_H);
-    if (volume > 4) {
-        u8g2.drawGlyph(CONFIG_VOLUME_CONTENT_X, CONFIG_VOLUME_CONTENT_Y, 0xe094);
-    } else {
-        u8g2.drawGlyph(CONFIG_VOLUME_CONTENT_X, CONFIG_VOLUME_CONTENT_Y, 0xe095);
+    CLEAR_AREA(32,
+               0,
+               64,
+               10);
+    if (volume > 8) {
+        return ;
     }
+    u8g2.setFont(CONFIG_VOLUME_FONT);
+    u8g2.drawGlyph(32 + 7, 9, 0x00e1);
+    u8g2.drawFrame(32 + 7 + 8 + 2, 2, 40, 6);
+    u8g2.drawBox(32 + 7 + 8 + 2, 2, 5 * volume, 6);
+}
+
+
+void feedVolumeSlider(void) {
+    CLEAR_AREA(32, 0, 64, 10);
+}
+
+
+void feedElectricity(uint8_t percentage) {
+    char buf[8] = { 0 };
+    CLEAR_AREA(96,
+               0,
+               32,
+               16);
+    u8g2.setFont(CONFIG_RSSI_FONT);
+    if (percentage >= 60) {
+        u8g2.drawGlyph(96 + 16 + 4, 16 - 2, 0xe1ff);
+    } else if (percentage >= 20) {
+        u8g2.drawGlyph(96 + 16 + 4, 16 - 2, 0xe1fe);
+    } else {
+        u8g2.drawGlyph(96 + 16 + 4, 16 - 2, 0xe1fd);
+    }
+    u8g2.setFont(u8g2_font_nokiafc22_tr);
+    sprintf(buf, "%d%%", percentage);
+    u8g2.drawStr(96, 16 - 2, buf);
 }
 
 
 void feedRSSI(int rssi) {
-    u8g2.setFont(CONFIG_RSSI_FONT);
+    char buf[8] = { 0 };
+
     CLEAR_AREA(CONFIG_RSSI_X,
                CONFIG_RSSI_Y,
                CONFIG_RSSI_W,
                CONFIG_RSSI_H);
+
+    u8g2.setFont(CONFIG_RSSI_FONT);
     if (rssi >= 80) {
-        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X, CONFIG_RSSI_CONTENT_Y, 0xe261);
+        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X + 16, CONFIG_RSSI_CONTENT_Y, 0xe261);
     } else if (rssi >= 40) {
-        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X, CONFIG_RSSI_CONTENT_Y, 0xe260);
+        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X + 16, CONFIG_RSSI_CONTENT_Y, 0xe260);
     } else if (rssi >= 20) {
-        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X, CONFIG_RSSI_CONTENT_Y, 0xe25f);
+        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X + 16, CONFIG_RSSI_CONTENT_Y, 0xe25f);
     } else if (rssi >= 10) {
-        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X, CONFIG_RSSI_CONTENT_Y, 0xe25e);
+        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X + 16, CONFIG_RSSI_CONTENT_Y, 0xe25e);
     } else {
-        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X, CONFIG_RSSI_CONTENT_Y, 0xe25d);
+        u8g2.drawGlyph(CONFIG_RSSI_CONTENT_X + 16, CONFIG_RSSI_CONTENT_Y, 0xe25d);
     }
+    u8g2.setFont(u8g2_font_nokiafc22_tr);
+    sprintf(buf, "%d", rssi);
+    u8g2.drawStr(96, 32 -4, buf);
 }
 
 
-void feedElectricity(double electricity) {
-    u8g2.setFont(CONFIG_ELECTRICITY_FONT);
-    CLEAR_AREA(CONFIG_ELECTRICITY_X,
-               CONFIG_ELECTRICITY_Y,
-               CONFIG_ELECTRICITY_W,
-               CONFIG_ELECTRICITY_H);
-    u8g2.drawGlyph(CONFIG_ELECTRICITY_CONTENT_X, CONFIG_ELECTRICITY_CONTENT_Y, 0xe250);
+void feedTxCXCSS(const char *cxcss) {
+    CLEAR_AREA(96,
+               32,
+               32,
+               16);
+    // u8g2.setFont(u8g2_font_tenstamps_mf);
+    // u8g2.drawGlyph(96 + 16, 48 + 16, 0x0054);
+    u8g2.setFont(u8g2_font_nokiafc22_tr);
+    u8g2.drawStr(96, 48 - 4, cxcss);
+}
+
+
+void feedRxCXCSS(const char *cxcss) {
+    CLEAR_AREA(96,
+               48,
+               32,
+               16);
+    // u8g2.setFont(u8g2_font_tenstamps_mf);
+    // u8g2.drawGlyph(96 + 16, 48 + 16, 0x0054);
+    u8g2.setFont(u8g2_font_nokiafc22_tr);
+    u8g2.drawStr(96, 64 - 4, cxcss);
 }
 
 
 void feedMainPage() {
     CLEAR_AREA(CONFIG_MAIN_PAGE_X, CONFIG_MAIN_PAGE_Y, CONFIG_MAIN_PAGE_W, CONFIG_MAIN_PAGE_H);
-    feedTransmitStatus(false);
+    // feedTransmitStatus();
     feedSettingsMenu(false);
     feedFilterMenu(false);
 }
 
 
-void feedTransmitStatus(bool status) {
-    u8g2.setFont(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_FONT);
+void feedTransmitStatus() {
     CLEAR_AREA(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X,
                CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y,
-               CONFIG_MAIN_PAGE_TRANSMIT_STATUS_W,
-               CONFIG_MAIN_PAGE_TRANSMIT_STATUS_H);
-    u8g2.drawGlyph(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_X, CONFIG_MAIN_PAGE_TRANSMIT_STATUS_CONTENT_Y, status ? 0xdc : 0x69);
-    u8g2.sendBuffer();
+               64,
+               64);
+
+    u8g2.setFont(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_FONT);
+    u8g2.drawGlyph(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 16, CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y + 16 + 32, 0xdc);
+}
+
+
+void feedRecvFreq(double freq) {
+    char buf[20] = { 0 };
+    CLEAR_AREA(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X,
+               CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y,
+               64,
+               64);
+
+    sprintf(buf, "%03ld", (long long)freq);
+    u8g2.setFont(u8g2_font_courB18_tf);
+    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 7, 10 + 26, buf);
+    u8g2.setFont(u8g2_font_courB12_tf);
+    long long t = (long long)freq;
+    sprintf(buf, "%03d", (int)((freq - t) * 1000));
+    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 14, 10 + 26 + 17 , buf);
 }
 
 
@@ -808,9 +905,83 @@ void feedSettingsPage() {
     feedSettingsPagebarTxCXCSS(false);
     feedSettingsPagebarSQ(false);
     feedSettingsPagebarRxCXCSS(false);
-
-    u8g2.sendBuffer();
 }
+
+
+const char title[][12] = {
+    "Band Width",
+    "Trans Freq",
+    "Recv Freq",
+    "TX CXCSS",
+    "SQ",
+    "RX CXCSS"
+};
+
+
+void feedSettingsPage1(uint8_t select) {
+    CLEAR_AREA(CONFIG_SETTINGS_PAGE_X,
+               CONFIG_SETTINGS_PAGE_Y,
+               CONFIG_SETTINGS_PAGE_W,
+               CONFIG_SETTINGS_PAGE_H);
+
+    feedSettingsPageTitle();
+
+    u8g2.setDrawColor(0xff);
+    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_BD_BOX_X + \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_BD_BOX_Y + \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_TOP),
+                    (CONFIG_SETTINGS_PAGE_BAR_BD_BOX_W - \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_BD_BOX_H - \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_BOTTOM - \
+                    CONFIG_SETTINGS_PAGE_BAR_BD_MARGIN_TOP));
+    u8g2.setDrawColor(0x00);
+    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, title[select]);
+
+    u8g2.setDrawColor(0x00);
+    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_TF_BOX_X + \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_Y + \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_W - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_H - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
+    u8g2.setDrawColor(0xff);
+    if (select + 1 > 5) {
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, title[select + 1 - 6]);
+    } else {
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, title[select + 1]);
+    }
+
+    u8g2.setDrawColor(0x00);
+    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_RF_BOX_X + \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_RF_BOX_Y + \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_TOP),
+                    (CONFIG_SETTINGS_PAGE_BAR_RF_BOX_W - \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_RF_BOX_H - \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_BOTTOM - \
+                    CONFIG_SETTINGS_PAGE_BAR_RF_MARGIN_TOP));
+    u8g2.setDrawColor(0xff);
+    if (select + 2 > 5) {
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, title[select + 2 - 6]);
+    } else {
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, title[select + 2]);
+    }
+
+    // feedSettingsPagebarRecvFreq(false);
+    // feedSettingsPagebarTxCXCSS(false);
+    // feedSettingsPagebarSQ(false);
+    // feedSettingsPagebarRxCXCSS(false);
+}
+
 
 void feedSettingsPageTitle() {
     CLEAR_AREA(CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_X,
@@ -1118,55 +1289,35 @@ void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, double bandwidth
     u8g2.setFont(CONFIG_SETTINGS_PAGE_BAR_SQ_BOX_FONT);
     u8g2.setDrawColor(0xff);
 
-    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_X + \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT),
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_Y + \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP),
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_W - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_RIGHT - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT) / 2,
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_H - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_BOTTOM - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP));
+    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_TF_BOX_X + \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_Y + \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP),
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_W - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_RIGHT - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT) / 2,
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_H - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
     sprintf(optionbuf, "%03ld", freq);
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_Y, optionbuf);
-
-    u8g2.setDrawColor(0xff);
-    if (freq - 3 < minFreq) {
-        sprintf(optionbuf, "%03ld", freq - 3 + (maxFreq - minFreq));
-    } else {
-        sprintf(optionbuf, "%03ld", freq - 3);
-    }
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
-
-    if (freq - 2 < minFreq) {
-        sprintf(optionbuf, "%03ld", freq - 2 + (maxFreq - minFreq));
-    } else {
-        sprintf(optionbuf, "%03ld", freq - 2);
-    }
     u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
 
-    if (freq - 1 < minFreq) {
-        sprintf(optionbuf, "%03ld", freq - 1 + (maxFreq - minFreq));
+    u8g2.setDrawColor(0xff);
+    if (freq - 1 < (long long)minFreq) {
+        sprintf(optionbuf, "%03ld", freq - 1 + ((long long)maxFreq - (long long)minFreq));
     } else {
         sprintf(optionbuf, "%03ld", freq - 1);
     }
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
+    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
 
-    if (freq + 1 < maxFreq) {
+    if (freq + 1 < (long long)maxFreq) {
         sprintf(optionbuf, "%03ld", freq + 1);
     } else {
-        sprintf(optionbuf, "%03ld", freq + 1 - (maxFreq - minFreq));
+        sprintf(optionbuf, "%03ld", freq + 1 - ((long long)maxFreq - (long long)minFreq));
     }
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_Y, optionbuf);
+    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
 
-    if (freq + 2 < maxFreq) {
-        sprintf(optionbuf, "%03ld", freq + 2);
-    } else {
-        sprintf(optionbuf, "%03ld", freq + 2 - (maxFreq - minFreq));
-    }
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_Y, optionbuf);
 }
 
 
@@ -1174,14 +1325,8 @@ void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
     char optionbuf[20] = { 0 };
     int freq1 = (int)(freq * 1000);
     int bandwidth1 = (int)(bandwidth * 1000);
-    // int range = freq1/bandwidth1;
 
-    // CLEAR_AREA(CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
-    //            CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_Y,
-    //            (CONFIG_SETTINGS_PAGE_W - CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X) / 2,
-    //            CONFIG_SETTINGS_PAGE_H - CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_Y);
-
-    CLEAR_AREA(32 + CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
+    CLEAR_AREA(64 + CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
                CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y + \
                CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_BOTTOM + \
                CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_BOTTOM + \
@@ -1191,55 +1336,34 @@ void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
 
     u8g2.setFont(CONFIG_SETTINGS_PAGE_BAR_SQ_BOX_FONT);
     u8g2.setDrawColor(0xff);
-    u8g2.drawBox(32 + (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_X + \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT),
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_Y + \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP),
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_W - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_RIGHT - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT) / 2,
-                 (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_H - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_BOTTOM - \
-                  CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP));
+    u8g2.drawBox(64 + (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_X + \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_Y + \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP),
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_W - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_RIGHT - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT) / 2,
+                 (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_H - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
+                  CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
     sprintf(optionbuf, "%d", freq1);
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_Y, optionbuf);
+    u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
 
     u8g2.setDrawColor(0xff);
-    if (freq1 - (3 * bandwidth1) < 0) {
-        sprintf(optionbuf, "%d", freq1 - (3 * bandwidth1) + 1000);
-    } else {
-        sprintf(optionbuf, "%d", freq1 - (3 * bandwidth1));
-    }
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
-
-    if (freq1 - (2 * bandwidth1) < 0) {
-        sprintf(optionbuf, "%d", freq1 - (2 * bandwidth1) + 1000);
-    } else {
-        sprintf(optionbuf, "%d", freq1 - (2 * bandwidth1));
-    }
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
-
     if (freq1 - (1 * bandwidth1) < 0) {
         sprintf(optionbuf, "%d", freq1 - (1 * bandwidth1) + 1000);
     } else {
         sprintf(optionbuf, "%d", freq1 - (1 * bandwidth1));
     }
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
+    u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
 
     if (freq1 + (1 * bandwidth1) < 1000) {
         sprintf(optionbuf, "%d", freq1 + (1 * bandwidth1));
     } else {
         sprintf(optionbuf, "%d", freq1 + (1 * bandwidth1) - 1000);
     }
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_Y, optionbuf);
-
-    if (freq1 + (2 * bandwidth1) < 1000) {
-        sprintf(optionbuf, "%d", freq1 + (2 * bandwidth1));
-    } else {
-        sprintf(optionbuf, "%d", freq1 + (2 * bandwidth1) - 1000);
-    }
-    u8g2.drawStr(32 + CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_Y, optionbuf);
+    u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
 }
 
 
@@ -1452,11 +1576,11 @@ void feedSettingsPagebarSQPageTitle() {
 
 void feedSettingsPagebarSQPageSlider(int value) {
     char optionbuf[20] = { 0 };
-    u8g2.drawFrame(0, 40, 64, 8);
-    u8g2.drawBox(0, 40, 8 * value, 8);
+    u8g2.drawFrame(32, 32, 64, 8);
+    u8g2.drawBox(32, 32, 8 * value, 8);
     sprintf(optionbuf, "%d", value);
     int w = u8g2.getStrWidth(optionbuf);
-    u8g2.drawStr((64 - w) / 2, 58, optionbuf);
+    u8g2.drawStr((128 - w) / 2, 50, optionbuf);
 }
 
 
@@ -1506,43 +1630,29 @@ void feedSettingsPagebarRxCXCSSPageTitle() {
 void feedSettingsPagebarCXCSSPageCXCSSList(int index, const char list[][5], int len) {
     u8g2.setFont(CONFIG_SETTINGS_PAGE_BAR_SQ_BOX_FONT);
     u8g2.setDrawColor(0xff);
-    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_X + \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT),
-                    (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_Y + \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP),
-                    (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_W - \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_RIGHT - \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_LEFT),
-                    (CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_BOX_H - \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_BOTTOM - \
-                    CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_MARGIN_TOP));
+    u8g2.drawBox((CONFIG_SETTINGS_PAGE_BAR_TF_BOX_X + \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_Y + \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_W - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_LEFT),
+                    (CONFIG_SETTINGS_PAGE_BAR_TF_BOX_H - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
+                    CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
-    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TXCXCSS_TEXT_Y, list[index]);
+    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, list[index]);
     u8g2.setDrawColor(0xff);
-    if (index - 3 < 0) {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, list[len - abs(index - 3)]);
-    } else {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, list[index - 3]);
-    }
-    if (index - 2 < 0) {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, list[len - abs(index - 2)]);
-    } else {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, list[index - 2]);
-    }
+
     if (index - 1 < 0) {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, list[len - abs(index - 1)]);
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, list[len - abs(index - 1)]);
     } else {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, list[index - 1]);
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, list[index - 1]);
     }
     if (index + 1 > 121) {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_Y, list[index + 1 - len]);
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, list[index + 1 - len]);
     } else {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_SQ_TEXT_Y, list[index + 1]);
-    }
-    if (index + 2 > 121) {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_Y, list[index + 2 - len]);
-    } else {
-        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_Y, list[index + 2]);
+        u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, list[index + 1]);
     }
 }
 
@@ -1626,6 +1736,7 @@ void feedSettingsPagebarRxCXCSS(bool select) {
     u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RXCXCSS_TEXT_Y, "RX CXCSS");
 }
 
+void feedFilterPageTitle();
 
 void feedFilterPage() {
     u8g2.setFont(CONFIG_FILTER_PAGE_FONT);
@@ -1633,6 +1744,40 @@ void feedFilterPage() {
                CONFIG_FILTER_PAGE_Y,
                CONFIG_FILTER_PAGE_W,
                CONFIG_FILTER_PAGE_H);
+    feedFilterPageTitle();
+}
+
+
+void feedFilterPageTitle() {
+    CLEAR_AREA(CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_X,
+               CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_Y,
+               CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_W,
+               CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_H);
+    u8g2.setFont(CONFIG_SETTINGS_PAGE_BAR_BD_BOX_FONT);
+    int w = u8g2.getStrWidth("Filter");
+    u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X + \
+                 (((CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_W - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_MARGIN_LEFT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_LEFT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_LEFT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_RIGHT - \
+                    CONFIG_SETTINGS_PAGE_BAR_TITLE_MARGIN_RIGHT) - w) / 2),
+                 CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y,
+                 "Filter");
+    if (CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_BOTTOM) {
+        u8g2.drawHLine((CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X +
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_BOTTOM),
+                       (CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y +
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_LEFT),
+                       (CONFIG_SETTINGS_PAGE_BAR_TITLE_BOX_W - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_MARGIN_LEFT - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_LEFT - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_LEFT - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_PADDING_RIGHT - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_BORDER_RIGHT - \
+                        CONFIG_SETTINGS_PAGE_BAR_TITLE_MARGIN_RIGHT));
+    }
 }
 
 

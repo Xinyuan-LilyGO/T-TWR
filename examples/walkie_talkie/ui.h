@@ -2,14 +2,19 @@
 
 void feedRSSI(int rssi);
 void feedVolume(uint8_t volume);
-void feedElectricity(double electricity);
+void feedVolumeSlider(void);
+void feedElectricity(uint8_t percentage);
+void feedTxCXCSS(const char *cxcss);
+void feedRxCXCSS(const char *cxcss);
 
 void feedMainPage();
-void feedTransmitStatus(bool status);
+void feedTransmitStatus();
+void feedRecvFreq(double freq);
 void feedSettingsMenu(bool select);
 void feedFilterMenu(bool select);
 
 void feedSettingsPage();
+void feedSettingsPage1(uint8_t select);
 void feedSettingsPagebarBandWidth(bool select);
 void feedSettingsPagebarBandWidthPage();
 void feedSettingsPagebarBandWidthPageBar1(bool select/*, bool enable*/);
