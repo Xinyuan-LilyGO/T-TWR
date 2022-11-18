@@ -10,15 +10,6 @@ SA868::SA868(Stream& stream, uint8_t pttPin, uint8_t pdPin, uint8_t rfPin) {
     _pttPin = pttPin;
     _pdPin = pdPin;
     _rfPin = rfPin;
-
-    pinMode(_pttPin, OUTPUT);
-    digitalWrite(_pttPin, HIGH);
-
-    pinMode(_pdPin, OUTPUT);
-    digitalWrite(_pdPin, LOW);
-
-    pinMode(_rfPin, OUTPUT);
-    digitalWrite(_rfPin, LOW);
 }
 
 
@@ -31,12 +22,40 @@ SA868::~SA868() {
 
 
 void SA868::begin() {
+    pinMode(_pdPin, OUTPUT);
     digitalWrite(_pdPin, HIGH);
     delay(1000);
+
+    pinMode(_rfPin, OUTPUT);
+    digitalWrite(_rfPin, LOW);
+
     _transmitStatus = false;
+    pinMode(_pttPin, OUTPUT);
     digitalWrite(_pttPin, HIGH);
+
+    setGroup(bandwidth, transFreq, recvFreq, (teCXCSS)txCXCSS, sq, (teCXCSS)rxCXCSS);
+    setFilter(emphasis, highPass, lowPass);
 }
 
+
+void SA868::sleep() {
+    digitalWrite(_pdPin, LOW);
+}
+
+
+void SA868::wake() {
+    digitalWrite(_pdPin, HIGH);
+}
+
+
+void SA868::highPower() {
+    digitalWrite(_rfPin, HIGH);
+}
+
+
+void SA868::lowPower() {
+    digitalWrite(_rfPin, LOW);
+}
 
 void SA868::receive() {
     if (!_transmitStatus) return ;
@@ -197,9 +216,13 @@ bool SA868::waitResponse(String& data, String rsp, uint32_t timeout) {
 
 bool SA868::checkFreq(bool bandwidth, double freq) {
     long long t = (long long)freq;
-    int bw = bandwidth ? 250 : 125;
-    t = (freq - t) * 1000;
-    if ((freq < 134.0 && freq > 480.0) || (freq > 174.0 && freq < 400.0)) {
+    // Serial.println(freq);
+    // Serial.println(t);
+    int bw = bandwidth ? 25000 : 12500;
+    t = (freq - t) * 1000 * 1000;
+    // Serial.println(t);
+    // Serial.println(bw);
+    if ((freq < 134.0 && freq > 480.0) || (freq > 174.0 && freq < 320.0)) {
         Serial.println(WARN"frequency out of range");
         return false;
     }

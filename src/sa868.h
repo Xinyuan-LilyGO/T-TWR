@@ -164,10 +164,17 @@ public:
 
     void begin();
 
+    void sleep();
+
+    void wake();
     /**
      * receive mode
      */
     void receive();
+
+    void highPower();
+
+    void lowPower();
 
     /**
      * transmission mode
