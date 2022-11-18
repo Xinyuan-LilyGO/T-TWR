@@ -838,19 +838,19 @@ void feedTransmitStatus() {
 }
 
 
-void feedRecvFreq(double freq) {
+void feedRecvFreq(long long freq) {
     char buf[20] = { 0 };
     CLEAR_AREA(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X,
                CONFIG_MAIN_PAGE_TRANSMIT_STATUS_Y,
                64,
                64);
 
-    sprintf(buf, "%03ld", (long long)freq);
+    sprintf(buf, "%03ld", freq / (1000 * 1000));
     u8g2.setFont(u8g2_font_courB18_tf);
     u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 7, 10 + 26, buf);
     u8g2.setFont(u8g2_font_courB12_tf);
-    long long t = (long long)freq;
-    sprintf(buf, "%04d", (int)((freq - t) * 10000));
+    // long long t = (long long)freq;
+    sprintf(buf, "%04d", (freq % (1000 * 1000)) / 100);
     u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 8, 10 + 26 + 17 , buf);
 }
 
@@ -1275,8 +1275,11 @@ void feedSettingsPagebarTransFreqPage() {
 }
 
 
-void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, double bandwidth, double minFreq, double maxFreq) {
+void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, int bandwidth, long long minFreq, long long maxFreq) {
     char optionbuf[20] = { 0 };
+    long long freq1 = freq / (1000 * 1000);
+    long long minFreq1 = minFreq / (1000 * 1000);
+    long long maxFreq1 = maxFreq / (1000 * 1000);
 
     CLEAR_AREA(CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
                CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y + \
@@ -1300,31 +1303,32 @@ void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, double bandwidth
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
-    sprintf(optionbuf, "%03ld", freq);
+    sprintf(optionbuf, "%03lld", freq1);
     u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
 
     u8g2.setDrawColor(0xff);
-    if (freq - 1 < (long long)minFreq) {
-        sprintf(optionbuf, "%03ld", freq - 1 + ((long long)maxFreq - (long long)minFreq));
+    if (freq1 - 1 < minFreq1) {
+        sprintf(optionbuf, "%03ld", freq1 - 1 + (maxFreq1 - minFreq1));
     } else {
-        sprintf(optionbuf, "%03ld", freq - 1);
+        sprintf(optionbuf, "%03ld", freq1 - 1);
     }
     u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
 
-    if (freq + 1 < (long long)maxFreq) {
-        sprintf(optionbuf, "%03ld", freq + 1);
+    if (freq1 + 1 < maxFreq1) {
+        sprintf(optionbuf, "%03ld", freq1 + 1);
     } else {
-        sprintf(optionbuf, "%03ld", freq + 1 - ((long long)maxFreq - (long long)minFreq));
+        sprintf(optionbuf, "%03ld", freq1 + 1 - (maxFreq1 - minFreq1));
     }
     u8g2.drawStr(CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
 
 }
 
 
-void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
+void feedSettingsPagebarTransFreqPageCXCSSList2(long long freq, int bandwidth) {
     char optionbuf[20] = { 0 };
-    int freq1 = (int)(freq * 1000 * 10);
-    int bandwidth1 = (int)(bandwidth * 1000 * 10);
+    // int freq1 = (int)(freq * 1000 * 10);
+    int freq1 = freq % (1000 * 1000);
+    // int bandwidth1 = (int)(bandwidth * 1000 * 10);
 
     CLEAR_AREA(64 + CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
                CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y + \
@@ -1347,21 +1351,21 @@ void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
-    sprintf(optionbuf, "%04d", freq1);
+    sprintf(optionbuf, "%04d", freq1 / 100);
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
 
     u8g2.setDrawColor(0xff);
-    if (freq1 - (1 * bandwidth1) < 0) {
-        sprintf(optionbuf, "%04d", freq1 - (1 * bandwidth1) + 10000);
+    if (freq1 - bandwidth < 0) {
+        sprintf(optionbuf, "%04d", (freq1 - bandwidth + 1000000) / 100);
     } else {
-        sprintf(optionbuf, "%04d", freq1 - (1 * bandwidth1));
+        sprintf(optionbuf, "%04d", (freq1 - bandwidth) / 100);
     }
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
 
-    if (freq1 + (1 * bandwidth1) < 10000) {
-        sprintf(optionbuf, "%04d", freq1 + (1 * bandwidth1));
+    if (freq1 + bandwidth < 1000000) {
+        sprintf(optionbuf, "%04d", (freq1 + bandwidth) / 100);
     } else {
-        sprintf(optionbuf, "%04d", freq1 + (1 * bandwidth1) - 10000);
+        sprintf(optionbuf, "%04d", (freq1 + bandwidth - 1000000) / 100);
     }
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
 }

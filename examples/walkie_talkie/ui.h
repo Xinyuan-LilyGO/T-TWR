@@ -11,7 +11,7 @@ void feedRxCXCSS(const char *cxcss);
 
 void feedMainPage();
 void feedTransmitStatus();
-void feedRecvFreq(double freq);
+void feedRecvFreq(long long freq);
 void feedSettingsMenu(bool select);
 void feedFilterMenu(bool select);
 
@@ -23,8 +23,8 @@ void feedSettingsPagebarBandWidthPageBar1(bool select/*, bool enable*/);
 void feedSettingsPagebarBandWidthPageBar2(bool select/*, bool enable*/);
 void feedSettingsPagebarTransFreq(bool select);
 void feedSettingsPagebarTransFreqPage();
-void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, double bandwidth, double minFreq, double maxFreq);
-void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth);
+void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, int bandwidth, long long minFreq, long long maxFreq);
+void feedSettingsPagebarTransFreqPageCXCSSList2(long long freq, int bandwidth);
 void feedSettingsPagebarRecvFreq(bool select);
 void feedSettingsPagebarRecvFreqPage();
 void feedSettingsPagebarTxCXCSS(bool select);

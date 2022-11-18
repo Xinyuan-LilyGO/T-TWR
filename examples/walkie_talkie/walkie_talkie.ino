@@ -295,6 +295,7 @@ void volumeDown() {
 void buttonOKClickCallbackSettingsPage() {
     lastCursor = curCursor;
     if (curCursor == 0) {
+        // band width setting
         curPage = 3;
         feedSettingsPagebarBandWidthPage();
         feedSettingsPagebarBandWidthPageBar1(!sa868.bandwidth);
@@ -309,38 +310,39 @@ void buttonOKClickCallbackSettingsPage() {
         buttonOK.attachClick(buttonOKClickCallbackBandwidthPage);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 1) {
+        // trans freq setting
         curPage = 4;
         feedSettingsPagebarTransFreqPage();
         feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.transFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
-        long long t = (long long)sa868.transFreq;
         if (sa868.bandwidth) {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.025);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq, 25000);
         } else {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.0125);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq, 12500);
         }
         u8g2.sendBuffer();
         encoderFn = encoderCallbackTransFreqPage1;
-        curCursor = (int)(sa868.transFreq - MIN_FREQ);
+        curCursor = (sa868.transFreq - MIN_FREQ) / (1 * 1000 * 1000);
         buttonOK.attachClick(buttonOKClickCallbackTransFreqPage1);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 2) {
+        // recv freq setting
         curPage = 5;
         feedSettingsPagebarRecvFreqPage();
         feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.recvFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
-        long long t = (long long)sa868.recvFreq;
+        // long long t = (long long)sa868.recvFreq;
         if (sa868.bandwidth) {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.025);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq, 25000);
         } else {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.0125);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq, 12500);
         }
         u8g2.sendBuffer();
         encoderFn = encoderCallbackTransFreqPage1;
-        curCursor = (int)(sa868.recvFreq - MIN_FREQ);
+        curCursor = (sa868.recvFreq - MIN_FREQ) / (1 * 1000 * 1000);
         buttonOK.attachClick(buttonOKClickCallbackRecvFreqPage1);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 3) {
+        // tx CSCSS setting
         curPage = 6;
-        Serial.printf("sa868.txCXCSS: %d\r\n", sa868.txCXCSS);
         encoderFn = encoderCallbackTXCXCSSPage;
         curCursor = sa868.txCXCSS;
         feedSettingsPagebarTxCXCSSPage();
@@ -349,8 +351,8 @@ void buttonOKClickCallbackSettingsPage() {
         buttonOK.attachClick(buttonOKClickCallbackTXCXCSSPage);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 4) {
+        // sq setting
         curPage = 7;
-        Serial.printf("sa868.sq: %d\r\n", sa868.sq);
         encoderFn = encoderCallbackSQPage;
         curCursor = sa868.sq;
         feedSettingsPagebarSQPage();
@@ -359,8 +361,8 @@ void buttonOKClickCallbackSettingsPage() {
         buttonOK.attachClick(buttonOKClickCallbackSQPage);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 5) {
+        // rx CSCSS setting
         curPage = 8;
-        Serial.printf("sa868.rxCXCSS: %d\r\n", sa868.rxCXCSS);
         encoderFn = encoderCallbackRXCXCSSPage;
         curCursor = sa868.rxCXCSS;
         feedSettingsPagebarRxCXCSSPage();
@@ -439,18 +441,16 @@ void encoderCallbackBandWidthPage(void *pvParameters) {
     u8g2.sendBuffer();
 }
 
-double tempFreq = 0.0;
+long long tempFreq = 0.0;
 
 // TransFreq Page
 void buttonOKClickCallbackTransFreqPage1() {
-    tempFreq = MIN_FREQ + curCursor;
-    long long t = (long long)sa868.transFreq;
+    tempFreq = MIN_FREQ + curCursor * 1000 * 1000;
     if (sa868.bandwidth) {
-        curCursor = (sa868.transFreq - t) / 0.025;
+        curCursor = (sa868.transFreq % (1000 * 1000)) / 25000;
     } else {
-        curCursor = (sa868.transFreq - t) / 0.0125;
+        curCursor = (sa868.transFreq % (1000 * 1000)) / 12500;
     }
-    // curCursor = lastCursor;
     encoderFn = encoderCallbackTransFreqPage2;
     buttonOK.attachClick(buttonOKClickCallbackTransFreqPage2);
 }
@@ -460,24 +460,22 @@ void encoderCallbackTransFreqPage1(void *pvParameters) {
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
-    if (pos > FREQ_RANGE) {
+    if (pos > FREQ_RANGE -1) {
         pos = 0;
     } else if (pos < 0) {
-        pos = FREQ_RANGE;
+        pos = FREQ_RANGE - 1;
     }
     curCursor = pos;
-
-    Serial.printf("curCursor: %d\r\n", curCursor);
-    feedSettingsPagebarTransFreqPageCXCSSList1((long long)(MIN_FREQ + curCursor), sa868.bandwidth, MIN_FREQ, MAX_FREQ);
+    feedSettingsPagebarTransFreqPageCXCSSList1((MIN_FREQ + curCursor * (1 * 1000 * 1000)), sa868.bandwidth, MIN_FREQ, MAX_FREQ);
     u8g2.sendBuffer();
 }
 
 
 void buttonOKClickCallbackTransFreqPage2() {
     if (sa868.bandwidth) {
-        tempFreq = tempFreq + curCursor * 0.025 ;
+        tempFreq = tempFreq + curCursor * 25000 ;
     } else {
-        tempFreq = tempFreq + curCursor * 0.0125 ;
+        tempFreq = tempFreq + curCursor * 12500 ;
     }
     if (sa868.checkFreq(sa868.bandwidth, sa868.recvFreq)) {
         sa868.setGroup(sa868.bandwidth, tempFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
@@ -485,7 +483,8 @@ void buttonOKClickCallbackTransFreqPage2() {
         sa868.setGroup(sa868.bandwidth, tempFreq, tempFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
     }
     vTaskResume(dataTaskHandler);
-    Serial.printf("I [Main]: set transFreq: %lf\r\n", sa868.transFreq);
+    Serial.printf("I [Main]: set tempFreq: %lld\r\n", tempFreq);
+    Serial.printf("I [Main]: set transFreq: %lld\r\n", sa868.transFreq);
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -502,9 +501,9 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
     int range = 0;
     pos = pos + (int)pvParameters;
     if (sa868.bandwidth) {
-        range = (1 / 0.025) - 1;
+        range = (1 * 1000 * 1000 / 25000) - 1;
     } else {
-        range= (1 / 0.0125) - 1;
+        range= (1 * 1000 * 1000 / 12500) - 1;
     }
     if (pos > range) {
         pos = 0;
@@ -513,12 +512,10 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
     }
     curCursor = pos;
 
-    Serial.printf("curCursor: %d\r\n", curCursor);
-    long long t = (long long)sa868.transFreq;
     if (sa868.bandwidth) {
-        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.025), 0.025);
+        feedSettingsPagebarTransFreqPageCXCSSList2(curCursor * 25000, 25000);
     } else {
-        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.0125), 0.0125);
+        feedSettingsPagebarTransFreqPageCXCSSList2(curCursor * 12500, 12500);
     }
     u8g2.sendBuffer();
 }
@@ -526,12 +523,12 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
 
 // recv page
 void buttonOKClickCallbackRecvFreqPage1() {
-    tempFreq = MIN_FREQ + curCursor;
-    long long t = (long long)sa868.recvFreq;
+    tempFreq = MIN_FREQ + curCursor * 1000 * 1000;
+
     if (sa868.bandwidth) {
-        curCursor = (sa868.recvFreq - t) / 0.025;
+        curCursor = (sa868.transFreq % (1000 * 1000)) / 25000;
     } else {
-        curCursor = (sa868.recvFreq - t) / 0.0125;
+        curCursor = (sa868.transFreq % (1000 * 1000)) / 12500;
     }
     // curCursor = lastCursor;
     encoderFn = encoderCallbackTransFreqPage2;
@@ -541,9 +538,9 @@ void buttonOKClickCallbackRecvFreqPage1() {
 
 void buttonOKClickCallbackRecvFreqPage2() {
     if (sa868.bandwidth) {
-        tempFreq = tempFreq + curCursor * 0.025 ;
+        tempFreq = tempFreq + curCursor * 25000 ;
     } else {
-        tempFreq = tempFreq + curCursor * 0.0125 ;
+        tempFreq = tempFreq + curCursor * 12500 ;
     }
     if (sa868.checkFreq(sa868.bandwidth, sa868.transFreq)) {
         sa868.setGroup(sa868.bandwidth,
@@ -561,8 +558,8 @@ void buttonOKClickCallbackRecvFreqPage2() {
                        (teCXCSS)sa868.rxCXCSS);
     }
     vTaskResume(dataTaskHandler);
-    Serial.printf("I [Main]: set tempFreq: %lf\r\n", tempFreq);
-    Serial.printf("I [Main]: set recvFreq: %lf\r\n", sa868.recvFreq);
+    Serial.printf("I [Main]: set tempFreq: %lld\r\n", tempFreq);
+    Serial.printf("I [Main]: set recvFreq: %lld\r\n", sa868.recvFreq);
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;

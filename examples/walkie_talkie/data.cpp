@@ -79,8 +79,8 @@ void data_init(SA868 &sa868) {
             goto OUT;
         }
         sa868.bandwidth = doc["band"]["bandwidth"].as<bool>();
-        sa868.transFreq = doc["band"]["transFreq"].as<double>();
-        sa868.recvFreq  = doc["band"]["recvFreq"].as<double>();
+        sa868.transFreq = doc["band"]["transFreq"].as<long long>();
+        sa868.recvFreq  = doc["band"]["recvFreq"].as<long long>();
         sa868.txCXCSS   = doc["band"]["txCXCSS"].as<int>();
         sa868.sq        = doc["band"]["sq"].as<uint8_t>();
         sa868.rxCXCSS   = doc["band"]["rxCXCSS"].as<int>();

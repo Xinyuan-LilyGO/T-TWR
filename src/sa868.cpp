@@ -13,9 +13,6 @@ SA868::SA868(Stream& stream, uint8_t pttPin, uint8_t pdPin, uint8_t rfPin) {
 }
 
 
-/**
- * destructor
- */
 SA868::~SA868() {
     _stream->flush();
 }
@@ -75,6 +72,7 @@ bool SA868::scanRF(double freq) {
     String data;
 
     // todo check freq
+    Serial.printf("S+%.4lf\r\n", freq);
     _stream->printf("S+%.4lf\r\n", freq);
     if (waitResponse(data) ) {
         Serial.println(INFO + data);
@@ -86,13 +84,15 @@ bool SA868::scanRF(double freq) {
 }
 
 
-bool SA868::setGroup(bool     bandwidth,
-                     double   transFreq,
-                     double   recvFreq,
-                     teCXCSS txCXCSS,
-                     uint8_t  sq,
-                     teCXCSS rxCXCSS) {
+bool SA868::setGroup(bool      bandwidth,
+                     long long transFreq,
+                     long long recvFreq,
+                     teCXCSS   txCXCSS,
+                     uint8_t   sq,
+                     teCXCSS   rxCXCSS) {
     String data;
+    char cmd[128] = { 0 };
+    size_t index = 0;
 
     if (!checkFreq(bandwidth, transFreq)) {
         Serial.println(WARN"transFreq frequency error");
@@ -107,22 +107,16 @@ bool SA868::setGroup(bool     bandwidth,
         Serial.println(WARN"Background noise is out of range");
         return false;
     }
-
     //AT+DMOSETGROUP=0,415.1250,415.1250,0000,4,0000\r\n
-    Serial.printf("AT+DMOSETGROUP=%d,%.4lf,%.4lf,%s,%d,%s\r\n",
-                    bandwidth ? 1 : 0,
-                    transFreq,
-                    recvFreq,
-                    cxcss[txCXCSS],
-                    sq,
-                    cxcss[rxCXCSS]);
-    _stream->printf("AT+DMOSETGROUP=%d,%.4lf,%.4lf,%s,%d,%s\r\n",
-                    bandwidth ? 1 : 0,
-                    transFreq,
-                    recvFreq,
-                    cxcss[txCXCSS],
-                    sq,
-                    cxcss[rxCXCSS]);
+    index += sprintf(&cmd[index], "AT+DMOSETGROUP=%d,", bandwidth ? 1 : 0);
+    index += sprintf(&cmd[index], "%03d.", (transFreq / (1000 * 1000)));
+    index += sprintf(&cmd[index], "%04d,", ((transFreq % (1000 * 1000)) / 100));
+    index += sprintf(&cmd[index], "%03d.", (recvFreq / (1000 * 1000)));
+    index += sprintf(&cmd[index], "%04d,", ((recvFreq % (1000 * 1000)) / 100));
+    index += sprintf(&cmd[index], "%s,%d,%s\r\n", cxcss[txCXCSS], sq, cxcss[rxCXCSS]);
+    Serial.printf("%s", cmd);
+
+    _stream->printf(cmd);
     if (waitResponse(data) ) {
         Serial.println(INFO + data);
         if (data.indexOf('0') != -1) {
@@ -149,6 +143,7 @@ bool SA868::setVolume(uint8_t volume) {
         Serial.println(WARN"volume out of range");
         return false;
     }
+    Serial.printf("AT+DMOSETVOLUME=%d\r\n", volume);
     _stream->printf("AT+DMOSETVOLUME=%d\r\n", volume);
     if (waitResponse(data) ) {
         Serial.println(INFO + data);
@@ -167,6 +162,7 @@ bool SA868::setVolume(uint8_t volume) {
 int SA868::getRSSI() {
     String data;
 
+    Serial.printf("AT+RSSI?\r\n");
     _stream->printf("AT+RSSI?\r\n");
     if (waitResponse(data) ) {
         Serial.println(INFO + data);
@@ -183,6 +179,7 @@ int SA868::getRSSI() {
 bool SA868::setFilter(bool emphasis, bool highPass, bool lowPass) {
     String data;
 
+    Serial.printf("AT+SETFILTER=%d,%d,%d\r\n", !emphasis, !highPass, !lowPass);
     _stream->printf("AT+SETFILTER=%d,%d,%d\r\n", !emphasis, !highPass, !lowPass);
     if (waitResponse(data) ) {
         Serial.println(INFO + data);
@@ -214,20 +211,16 @@ bool SA868::waitResponse(String& data, String rsp, uint32_t timeout) {
     return false;
 }
 
-bool SA868::checkFreq(bool bandwidth, double freq) {
-    long long t = (long long)freq;
-    // Serial.println(freq);
-    // Serial.println(t);
+bool SA868::checkFreq(bool bandwidth, long long freq) {
     int bw = bandwidth ? 25000 : 12500;
-    t = (freq - t) * 1000 * 1000;
-    // Serial.println(t);
-    // Serial.println(bw);
-    if ((freq < 134.0 && freq > 480.0) || (freq > 174.0 && freq < 320.0)) {
+
+    if ((freq < (134 * 1000 * 1000) && freq > (480 * 1000 * 1000)) || \
+        (freq > (174 * 1000 * 1000) && freq < (320 * 1000 * 1000))) {
         Serial.println(WARN"frequency out of range");
         return false;
     }
 
-    if (t % bw != 0) {
+    if (freq % bw != 0) {
         Serial.println(WARN"frequency error");
         return false;
     }

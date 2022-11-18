@@ -208,12 +208,12 @@ public:
      * - true success
      * - false Data setting out of range
      */
-    bool setGroup(bool     bandwidth,
-                  double   transFreq,
-                  double   recvFreq,
-                  teCXCSS txCXCSS,
-                  uint8_t  sq,
-                  teCXCSS rxCXCSS);
+    bool setGroup(bool      bandwidth,
+                  long long transFreq,
+                  long long recvFreq,
+                  teCXCSS   txCXCSS,
+                  uint8_t   sq,
+                  teCXCSS   rxCXCSS);
 
     /**
      * Set volume level
@@ -246,19 +246,19 @@ public:
      */
     bool setFilter(bool emphasis, bool highPass, bool lowPass);
 
-    bool checkFreq(bool bandwidth, double freq);
+    bool checkFreq(bool bandwidth, long long freq);
 
-    bool    bandwidth;
-    double  transFreq;
-    double  recvFreq;
-    int     txCXCSS;
-    uint8_t sq;
-    int     rxCXCSS;
-    uint8_t volume;
-    int     rssi;
-    bool    emphasis;
-    bool    highPass;
-    bool    lowPass;
+    bool       bandwidth;
+    long long  transFreq;
+    long long  recvFreq;
+    int        txCXCSS;
+    uint8_t    sq;
+    int        rxCXCSS;
+    uint8_t    volume;
+    int        rssi;
+    bool       emphasis;
+    bool       highPass;
+    bool       lowPass;
 
 private:
     bool waitResponse(String& data, String rsp = "\r\n", uint32_t timeout = 1000);
