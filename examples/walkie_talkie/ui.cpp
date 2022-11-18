@@ -850,8 +850,8 @@ void feedRecvFreq(double freq) {
     u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 7, 10 + 26, buf);
     u8g2.setFont(u8g2_font_courB12_tf);
     long long t = (long long)freq;
-    sprintf(buf, "%03d", (int)((freq - t) * 1000));
-    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 14, 10 + 26 + 17 , buf);
+    sprintf(buf, "%04d", (int)((freq - t) * 10000));
+    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 8, 10 + 26 + 17 , buf);
 }
 
 
@@ -1323,8 +1323,8 @@ void feedSettingsPagebarTransFreqPageCXCSSList1(long long freq, double bandwidth
 
 void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
     char optionbuf[20] = { 0 };
-    int freq1 = (int)(freq * 1000);
-    int bandwidth1 = (int)(bandwidth * 1000);
+    int freq1 = (int)(freq * 1000 * 10);
+    int bandwidth1 = (int)(bandwidth * 1000 * 10);
 
     CLEAR_AREA(64 + CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_X,
                CONFIG_SETTINGS_PAGE_BAR_TITLE_TEXT_Y + \
@@ -1347,21 +1347,21 @@ void feedSettingsPagebarTransFreqPageCXCSSList2(double freq, double bandwidth) {
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_BOTTOM - \
                   CONFIG_SETTINGS_PAGE_BAR_TF_MARGIN_TOP));
     u8g2.setDrawColor(0x00);
-    sprintf(optionbuf, "%d", freq1);
+    sprintf(optionbuf, "%04d", freq1);
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_TF_TEXT_Y, optionbuf);
 
     u8g2.setDrawColor(0xff);
     if (freq1 - (1 * bandwidth1) < 0) {
-        sprintf(optionbuf, "%d", freq1 - (1 * bandwidth1) + 1000);
+        sprintf(optionbuf, "%04d", freq1 - (1 * bandwidth1) + 10000);
     } else {
-        sprintf(optionbuf, "%d", freq1 - (1 * bandwidth1));
+        sprintf(optionbuf, "%04d", freq1 - (1 * bandwidth1));
     }
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_BD_TEXT_Y, optionbuf);
 
-    if (freq1 + (1 * bandwidth1) < 1000) {
-        sprintf(optionbuf, "%d", freq1 + (1 * bandwidth1));
+    if (freq1 + (1 * bandwidth1) < 10000) {
+        sprintf(optionbuf, "%04d", freq1 + (1 * bandwidth1));
     } else {
-        sprintf(optionbuf, "%d", freq1 + (1 * bandwidth1) - 1000);
+        sprintf(optionbuf, "%04d", freq1 + (1 * bandwidth1) - 10000);
     }
     u8g2.drawStr(64 + CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_X, CONFIG_SETTINGS_PAGE_BAR_RF_TEXT_Y, optionbuf);
 }

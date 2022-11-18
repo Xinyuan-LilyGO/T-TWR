@@ -3,9 +3,11 @@
 /***        include files                                                   ***/
 /******************************************************************************/
 
+#include "config.h"
 #include "ui.h"
 #include "data.h"
 #include "sa868.h"
+#include "logo.h"
 
 #include <U8g2lib.h>
 #include <ArduinoJson.h>
@@ -18,31 +20,29 @@
 #include <esp_adc_cal.h>
 
 #include <Wire.h>
-#include <LittleFS.h>
 #include <Arduino.h>
 
 /******************************************************************************/
 /***        macro definitions                                               ***/
 /******************************************************************************/
 
-#define CONFIG_SA868_TX_PIN  (47)
-#define CONFIG_SA868_RX_PIN  (48)
-#define CONFIG_SA868_PTT_PIN (41)
-#define CONFIG_SA868_PD_PIN  (40)
-#define CONFIG_SA868_RF_PIN  (39)
+#define SA868_TX_PIN  (47)
+#define SA868_RX_PIN  (48)
+#define SA868_PTT_PIN (41)
+#define SA868_PD_PIN  (40)
+#define SA868_RF_PIN  (39)
 
-#define CONFIG_BUTTON_PTT_PIN (38)
-#define CONFIG_BUTTON_SW5_PIN (3)
-#define CONFIG_BUTTON_SW6_PIN (0)
+#define BUTTON_PTT_PIN  (38)
+#define BUTTON_UP_PIN   (3)
+#define BUTTON_DOWN_PIN (0)
 
-#define CONFIG_ENCODER_A_PIN   (9)
-#define CONFIG_ENCODER_B_PIN   (5)
-// #define CONFIG_ENCODER_SW1_PIN (6)
-#define CONFIG_ENCODER_SW2_PIN (7)
+#define ENCODER_A_PIN  (9)
+#define ENCODER_B_PIN  (5)
+#define ENCODER_OK_PIN (7)
 
-#define CONFIG_BATTERY_ADC_PIN (15)
-
-#define CONFIG_LED_GREEN       (1)
+#define BATTERY_ADC_PIN (6)
+#define OLED_POWER_PIN  (21)
+#define LED_PIN         (1)
 
 /******************************************************************************/
 /***        type definitions                                                ***/
@@ -62,16 +62,17 @@ typedef void (*EncoderCallback)(void *);
 /***        local variables                                                 ***/
 /******************************************************************************/
 
-OneButton buttonUp(CONFIG_BUTTON_SW5_PIN, true);
-OneButton buttonDown(CONFIG_BUTTON_SW6_PIN, true);
-OneButton buttonOK(CONFIG_ENCODER_SW2_PIN, true);
-OneButton buttonPTT(CONFIG_BUTTON_PTT_PIN, true);
-RotaryEncoder encoder(CONFIG_ENCODER_B_PIN, CONFIG_ENCODER_A_PIN, RotaryEncoder::LatchMode::FOUR3);
+OneButton buttonUp(BUTTON_UP_PIN, true);
+OneButton buttonDown(BUTTON_DOWN_PIN, true);
+OneButton buttonOK(ENCODER_OK_PIN, true);
+OneButton buttonPTT(BUTTON_PTT_PIN, true);
+RotaryEncoder encoder(ENCODER_B_PIN, ENCODER_A_PIN, RotaryEncoder::LatchMode::FOUR3);
 
-SA868 sa868(Serial1, CONFIG_SA868_PTT_PIN, CONFIG_SA868_PD_PIN, CONFIG_SA868_RF_PIN);
+SA868 sa868(Serial1, SA868_PTT_PIN, SA868_PD_PIN, SA868_RF_PIN);
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 14, 13);
 
 EncoderCallback encoderFn;
+TaskHandle_t dataTaskHandler;
 TaskHandle_t clearvolumeSliderTaskHandler;
 int vref = 1100;
 
@@ -83,33 +84,41 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
 
-    pinMode(21, OUTPUT);
-    digitalWrite(21, HIGH);
+    print_wakeup_reason();
 
     app_nvs_init();
     data_init(sa868);
     adc_init();
 
-    Serial1.begin(9600, SERIAL_8N1, CONFIG_SA868_RX_PIN, CONFIG_SA868_TX_PIN);
+    Serial1.begin(9600, SERIAL_8N1, SA868_RX_PIN, SA868_TX_PIN);
     sa868.begin();
 
+    pinMode(OLED_POWER_PIN, OUTPUT);
+    digitalWrite(OLED_POWER_PIN, LOW);
+
     u8g2.begin();
+    u8g2.setContrast(0);
     u8g2.clearBuffer();
-    delay(1000);
+    u8g2.drawXBM(0, 0, 128, 64, gImage_logo);
+    u8g2.sendBuffer();
+    pinMode(OLED_POWER_PIN, OUTPUT);
+    digitalWrite(OLED_POWER_PIN, HIGH);
+    u8g2.setContrast(255);
+    delay(1500);
     ui();
 
     buttonUp.attachClick(volumeUp);
     buttonDown.attachClick(volumeDown);
     buttonOK.attachClick(buttonOKClickCallbackMainPage);
-    pinMode(CONFIG_BUTTON_PTT_PIN, INPUT);
+    buttonOK.setPressTicks(2000);
+    buttonOK.attachLongPressStart(buttonOKLongPressCallbackScreenOff);
+    buttonOK.attachLongPressStop(buttonOKLongPressCallbackDeepSleep);
     buttonPTT.attachLongPressStart(transmit);
     buttonPTT.attachLongPressStop(receive);
 
     xTaskCreatePinnedToCore(encoderTask, "encoderTask", 4096, NULL, 8, NULL, 1);
-    xTaskCreatePinnedToCore(scanRFTask, "scanRFTask", 4096, NULL, 6, NULL, ARDUINO_RUNNING_CORE);
-    xTaskCreatePinnedToCore(uiTask, "uiTask", 4096, NULL, 5, NULL, 1);
-    // xTaskCreatePinnedToCore(buttonTask, "buttonTask", 4096, NULL, 6, NULL, 1);
-    // xTaskCreatePinnedToCore(buttonTask, "buttonTask", 4096, NULL, 4, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(updateTask, "updateTask", 4096, NULL, 6, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(dataTask, "dataTask", 4096, NULL, 5, &dataTaskHandler, 1);
     xTaskCreatePinnedToCore(clearvolumeSliderTask, "clearvolumeSliderTask", 4096, NULL, 2, &clearvolumeSliderTaskHandler, 1);
 }
 
@@ -137,9 +146,9 @@ void app_nvs_init(void)
 
 void adc_init() {
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_2, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
     if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
-        Serial.printf("eFuse Vref:%u mV", adc_chars.vref);
+        Serial.printf("eFuse Vref: %u mV", adc_chars.vref);
         vref = adc_chars.vref;
     }
 }
@@ -147,8 +156,8 @@ void adc_init() {
 
 uint8_t getBatteryPercentage() {
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_2, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
-    uint32_t v = esp_adc_cal_raw_to_voltage(analogRead(CONFIG_BATTERY_ADC_PIN), &adc_chars);
+    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    uint32_t v = esp_adc_cal_raw_to_voltage(analogRead(BATTERY_ADC_PIN), &adc_chars);
     float battery_voltage = ((float)v / 1000) * 2;
     Serial.print("ADC RAW: ");
     Serial.println(v);
@@ -162,13 +171,12 @@ uint8_t getBatteryPercentage() {
 }
 
 
-void scanRFTask(void *pvParameters) {
+void updateTask(void *pvParameters) {
     while (1) {
         if (curPage == 0) {
             feedElectricity(getBatteryPercentage());
             feedRSSI(sa868.getRSSI());
             u8g2.sendBuffer();
-            // feedElectricity(0);
         }
         delay(5000);
     }
@@ -176,26 +184,12 @@ void scanRFTask(void *pvParameters) {
 }
 
 
-void buttonTask(void *pvParameters) {
+void dataTask(void *pvParameter) {
+    vTaskSuspend(dataTaskHandler);
     while (1) {
-        if (digitalRead(CONFIG_BUTTON_PTT_PIN)) {
-            // receive();
-            digitalWrite(CONFIG_SA868_PTT_PIN, HIGH);
-        } else {
-            // transmit();
-            digitalWrite(CONFIG_SA868_PTT_PIN, LOW);
-        }
-        delay(10);
-    }
-    vTaskDelete(NULL);
-}
-
-
-void uiTask(void *pvParameter) {
-    while (1) {
-        // u8g2.sendBuffer();
         data_save(sa868);
-        delay(5000);
+        vTaskSuspend(dataTaskHandler);
+        delay(1000);
     }
     vTaskDelete(NULL);
 }
@@ -205,12 +199,10 @@ void clearvolumeSliderTask(void *pvParameter) {
     vTaskSuspend(clearvolumeSliderTaskHandler);
     while (1) {
         delay(1500);
-        // vTaskDelay(1500 / portTICK_PERIOD_MS);
         feedVolumeSlider();
         u8g2.sendBuffer();
         vTaskSuspend(clearvolumeSliderTaskHandler);
     }
-
     vTaskDelete(NULL);
 }
 
@@ -220,17 +212,13 @@ void loop() {
     buttonUp.tick();
     buttonDown.tick();
     buttonPTT.tick();
-    // getBatteryPercentage();
     delay(10);
 }
 
 
 void transmit() {
     if (curPage == 0) {
-        // Serial.printf("transmit\n");
         sa868.transmit();
-        // pinMode(42, OUTPUT);
-        // digitalWrite(42, LOW);
         feedTransmitStatus();
         u8g2.sendBuffer();
     }
@@ -239,10 +227,7 @@ void transmit() {
 
 void receive() {
     if (curPage == 0) {
-        // Serial.printf("receive\n");
         sa868.receive();
-        // pinMode(42, OUTPUT);
-        // digitalWrite(42, LOW);
         feedRecvFreq(sa868.recvFreq);
         u8g2.sendBuffer();
     }
@@ -281,9 +266,6 @@ void ui() {
     feedElectricity(getBatteryPercentage());
     feedTxCXCSS(cxcss[sa868.txCXCSS]);
     feedRxCXCSS(cxcss[sa868.rxCXCSS]);
-    // u8g2.setDrawColor(0xff);
-    // u8g2.drawBox(96, 32, 32, 32);
-    // u8g2.setDrawColor(0x00);
     u8g2.sendBuffer();
     encoderFn = encoderCallbackMainPage;
 }
@@ -292,6 +274,7 @@ void ui() {
 void volumeUp() {
     vTaskSuspend(clearvolumeSliderTaskHandler);
     sa868.setVolume(sa868.volume + 1);
+    vTaskResume(dataTaskHandler);
     feedVolume(sa868.volume);
     u8g2.sendBuffer();
     vTaskResume(clearvolumeSliderTaskHandler);
@@ -301,6 +284,7 @@ void volumeUp() {
 void volumeDown() {
     vTaskSuspend(clearvolumeSliderTaskHandler);
     sa868.setVolume(sa868.volume - 1);
+    vTaskResume(dataTaskHandler);
     feedVolume(sa868.volume);
     u8g2.sendBuffer();
     vTaskResume(clearvolumeSliderTaskHandler);
@@ -317,8 +301,7 @@ void buttonOKClickCallbackSettingsPage() {
         feedSettingsPagebarBandWidthPageBar2(sa868.bandwidth);
         u8g2.sendBuffer();
         encoderFn = encoderCallbackBandWidthPage;
-        if (sa868.bandwidth)
-        {
+        if (sa868.bandwidth) {
             curCursor = 1;
         } else {
             curCursor = 0;
@@ -328,31 +311,31 @@ void buttonOKClickCallbackSettingsPage() {
     } else if (curCursor == 1) {
         curPage = 4;
         feedSettingsPagebarTransFreqPage();
-        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.transFreq, sa868.bandwidth, 134.0, 174.0);
+        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.transFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
         long long t = (long long)sa868.transFreq;
         if (sa868.bandwidth) {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.25);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.025);
         } else {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.125);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq - t, 0.0125);
         }
         u8g2.sendBuffer();
         encoderFn = encoderCallbackTransFreqPage1;
-        curCursor = (int)(sa868.transFreq - 134.0);
+        curCursor = (int)(sa868.transFreq - MIN_FREQ);
         buttonOK.attachClick(buttonOKClickCallbackTransFreqPage1);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 2) {
         curPage = 5;
         feedSettingsPagebarRecvFreqPage();
-        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.recvFreq, sa868.bandwidth, 134.0, 174.0);
+        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.recvFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
         long long t = (long long)sa868.recvFreq;
         if (sa868.bandwidth) {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.25);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.025);
         } else {
-            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.125);
+            feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq - t, 0.0125);
         }
         u8g2.sendBuffer();
         encoderFn = encoderCallbackTransFreqPage1;
-        curCursor = (int)(sa868.recvFreq - 134.0);
+        curCursor = (int)(sa868.recvFreq - MIN_FREQ);
         buttonOK.attachClick(buttonOKClickCallbackRecvFreqPage1);
         buttonOK.attachDoubleClick(buttonOKDoubleClickCallbackSettingsPage);
     } else if (curCursor == 3) {
@@ -390,9 +373,8 @@ void buttonOKClickCallbackSettingsPage() {
 
 
 void encoderCallbackSettingsPage(void *pvParameters) {
-    // static int pos = 0;
-
     curCursor = curCursor + (int)pvParameters;
+
     if (curCursor > 5) {
         curCursor = 0;
     } else if (curCursor < 0) {
@@ -400,65 +382,6 @@ void encoderCallbackSettingsPage(void *pvParameters) {
     }
     // curCursor = pos;
     feedSettingsPage1(curCursor);
-    // switch (curCursor) {
-    //     case 0:
-    //         feedSettingsPagebarBandWidth(true);
-    //         feedSettingsPagebarTransFreq(false);
-    //         feedSettingsPagebarRecvFreq(false);
-    //         feedSettingsPagebarTxCXCSS(false);
-    //         feedSettingsPagebarSQ(false);
-    //         feedSettingsPagebarRxCXCSS(false);
-    //         break;
-
-    //     case 1:
-    //         feedSettingsPagebarBandWidth(false);
-    //         feedSettingsPagebarTransFreq(true);
-    //         feedSettingsPagebarRecvFreq(false);
-    //         feedSettingsPagebarTxCXCSS(false);
-    //         feedSettingsPagebarSQ(false);
-    //         feedSettingsPagebarRxCXCSS(false);
-    //         break;
-
-    //     case 2:
-    //         feedSettingsPagebarBandWidth(false);
-    //         feedSettingsPagebarTransFreq(false);
-    //         feedSettingsPagebarRecvFreq(true);
-    //         feedSettingsPagebarTxCXCSS(false);
-    //         feedSettingsPagebarSQ(false);
-    //         feedSettingsPagebarRxCXCSS(false);
-    //         break;
-
-    //     case 3:
-    //         feedSettingsPagebarBandWidth(false);
-    //         feedSettingsPagebarTransFreq(false);
-    //         feedSettingsPagebarRecvFreq(false);
-    //         feedSettingsPagebarTxCXCSS(true);
-    //         feedSettingsPagebarSQ(false);
-    //         feedSettingsPagebarRxCXCSS(false);
-    //         break;
-
-    //     case 4:
-    //         feedSettingsPagebarBandWidth(false);
-    //         feedSettingsPagebarTransFreq(false);
-    //         feedSettingsPagebarRecvFreq(false);
-    //         feedSettingsPagebarTxCXCSS(false);
-    //         feedSettingsPagebarSQ(true);
-    //         feedSettingsPagebarRxCXCSS(false);
-    //         break;
-
-    //     case 5:
-    //         feedSettingsPagebarBandWidth(false);
-    //         feedSettingsPagebarTransFreq(false);
-    //         feedSettingsPagebarRecvFreq(false);
-    //         feedSettingsPagebarTxCXCSS(false);
-    //         feedSettingsPagebarSQ(false);
-    //         feedSettingsPagebarRxCXCSS(true);
-    //         break;
-
-    //     default:
-    //         break;
-    // }
-
     u8g2.sendBuffer();
 }
 
@@ -477,15 +400,7 @@ void buttonOKDoubleClickCallbackSettingsPage() {
 
 // bandwidth page
 void buttonOKClickCallbackBandwidthPage() {
-    // todo: set bandwidth
-    if (curCursor == 0) {
-        sa868.bandwidth = false;
-        // sa868.setGroup(false, sa868.transFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
-    } else {
-        sa868.bandwidth = true;
-        // sa868.setGroup(true, sa868.transFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
-    }
-    // sa868.setGroup(sSA868Data.bandwidth, sSA868Data.transFreq, sSA868Data.recvFreq, (teCXCSS)sSA868Data.txCXCSS, sSA868Data.sq, (teCXCSS)sSA868Data.rxCXCSS);
+    sa868.bandwidth = curCursor == 0 ? false : true;
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -528,14 +443,14 @@ double tempFreq = 0.0;
 
 // TransFreq Page
 void buttonOKClickCallbackTransFreqPage1() {
-    tempFreq = 134.0 + curCursor;
+    tempFreq = MIN_FREQ + curCursor;
     long long t = (long long)sa868.transFreq;
     if (sa868.bandwidth) {
-        curCursor = (sa868.transFreq - t) / 0.25;
+        curCursor = (sa868.transFreq - t) / 0.025;
     } else {
-        curCursor = (sa868.transFreq - t) / 0.125;
+        curCursor = (sa868.transFreq - t) / 0.0125;
     }
-    curCursor = lastCursor;
+    // curCursor = lastCursor;
     encoderFn = encoderCallbackTransFreqPage2;
     buttonOK.attachClick(buttonOKClickCallbackTransFreqPage2);
 }
@@ -545,30 +460,31 @@ void encoderCallbackTransFreqPage1(void *pvParameters) {
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
-    if (pos > 39) {
+    if (pos > FREQ_RANGE) {
         pos = 0;
     } else if (pos < 0) {
-        pos = 39;
+        pos = FREQ_RANGE;
     }
     curCursor = pos;
 
     Serial.printf("curCursor: %d\r\n", curCursor);
-    feedSettingsPagebarTransFreqPageCXCSSList1((long long)(134.0 + curCursor), sa868.bandwidth, 134.0, 174.0);
+    feedSettingsPagebarTransFreqPageCXCSSList1((long long)(MIN_FREQ + curCursor), sa868.bandwidth, MIN_FREQ, MAX_FREQ);
     u8g2.sendBuffer();
 }
 
 
 void buttonOKClickCallbackTransFreqPage2() {
     if (sa868.bandwidth) {
-        tempFreq = tempFreq + curCursor * 0.25 ;
+        tempFreq = tempFreq + curCursor * 0.025 ;
     } else {
-        tempFreq = tempFreq + curCursor * 0.125 ;
+        tempFreq = tempFreq + curCursor * 0.0125 ;
     }
     if (sa868.checkFreq(sa868.bandwidth, sa868.recvFreq)) {
         sa868.setGroup(sa868.bandwidth, tempFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
     } else {
         sa868.setGroup(sa868.bandwidth, tempFreq, tempFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)sa868.rxCXCSS);
     }
+    vTaskResume(dataTaskHandler);
     Serial.printf("I [Main]: set transFreq: %lf\r\n", sa868.transFreq);
     curPage = 1;
     curCursor = lastCursor;
@@ -586,9 +502,9 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
     int range = 0;
     pos = pos + (int)pvParameters;
     if (sa868.bandwidth) {
-        range = (1 / 0.25) - 1;
+        range = (1 / 0.025) - 1;
     } else {
-        range= (1 / 0.125) - 1;
+        range= (1 / 0.0125) - 1;
     }
     if (pos > range) {
         pos = 0;
@@ -600,9 +516,9 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
     Serial.printf("curCursor: %d\r\n", curCursor);
     long long t = (long long)sa868.transFreq;
     if (sa868.bandwidth) {
-        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.25), 0.25);
+        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.025), 0.025);
     } else {
-        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.125), 0.125);
+        feedSettingsPagebarTransFreqPageCXCSSList2((curCursor * 0.0125), 0.0125);
     }
     u8g2.sendBuffer();
 }
@@ -610,14 +526,14 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
 
 // recv page
 void buttonOKClickCallbackRecvFreqPage1() {
-    tempFreq = 134.0 + curCursor;
+    tempFreq = MIN_FREQ + curCursor;
     long long t = (long long)sa868.recvFreq;
     if (sa868.bandwidth) {
-        curCursor = (sa868.recvFreq - t) / 0.25;
+        curCursor = (sa868.recvFreq - t) / 0.025;
     } else {
-        curCursor = (sa868.recvFreq - t) / 0.125;
+        curCursor = (sa868.recvFreq - t) / 0.0125;
     }
-    curCursor = lastCursor;
+    // curCursor = lastCursor;
     encoderFn = encoderCallbackTransFreqPage2;
     buttonOK.attachClick(buttonOKClickCallbackRecvFreqPage2);
 }
@@ -625,9 +541,9 @@ void buttonOKClickCallbackRecvFreqPage1() {
 
 void buttonOKClickCallbackRecvFreqPage2() {
     if (sa868.bandwidth) {
-        tempFreq = tempFreq + curCursor * 0.25 ;
+        tempFreq = tempFreq + curCursor * 0.025 ;
     } else {
-        tempFreq = tempFreq + curCursor * 0.125 ;
+        tempFreq = tempFreq + curCursor * 0.0125 ;
     }
     if (sa868.checkFreq(sa868.bandwidth, sa868.transFreq)) {
         sa868.setGroup(sa868.bandwidth,
@@ -644,6 +560,7 @@ void buttonOKClickCallbackRecvFreqPage2() {
                        sa868.sq,
                        (teCXCSS)sa868.rxCXCSS);
     }
+    vTaskResume(dataTaskHandler);
     Serial.printf("I [Main]: set tempFreq: %lf\r\n", tempFreq);
     Serial.printf("I [Main]: set recvFreq: %lf\r\n", sa868.recvFreq);
     curPage = 1;
@@ -666,6 +583,7 @@ void buttonOKClickCallbackTXCXCSSPage() {
                    (teCXCSS)curCursor,
                    sa868.sq,
                    (teCXCSS)sa868.rxCXCSS);
+    vTaskResume(dataTaskHandler);
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -703,6 +621,7 @@ void buttonOKClickCallbackSQPage() {
                    (teCXCSS)sa868.txCXCSS,
                    curCursor,
                    (teCXCSS)sa868.rxCXCSS);
+    vTaskResume(dataTaskHandler);
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -735,6 +654,7 @@ void encoderCallbackSQPage(void *pvParameters) {
 void buttonOKClickCallbackRXCXCSSPage() {
     // sa868.rxCXCSS = curCursor;
     sa868.setGroup(sa868.bandwidth, sa868.transFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)curCursor);
+    vTaskResume(dataTaskHandler);
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -767,17 +687,15 @@ void encoderCallbackRXCXCSSPage(void *pvParameters) {
 void buttonOKClickCallbackFilterPage() {
     if (curCursor == 0) {
         feedFilterPageBar1(true, !sa868.emphasis);
-        // sa868.emphasis = !sa868.emphasis;
         sa868.setFilter(!sa868.emphasis, sa868.highPass, sa868.lowPass);
     } else if (curCursor == 1) {
         feedFilterPageBar2(true, !sa868.highPass);
-        // sa868.highPass = !sa868.highPass;
         sa868.setFilter(sa868.emphasis, !sa868.highPass, sa868.lowPass);
     } else if (curCursor == 2) {
         feedFilterPageBar3(true, !sa868.lowPass);
-        // sa868.lowPass = !sa868.lowPass;
         sa868.setFilter(sa868.emphasis, sa868.highPass, !sa868.lowPass);
     }
+    vTaskResume(dataTaskHandler);
     u8g2.sendBuffer();
 }
 
@@ -889,6 +807,59 @@ void encoderCallbackMainPage(void *pvParameters) {
             break;
     }
     u8g2.sendBuffer();
+}
+
+
+void buttonOKLongPressCallbackScreenOff() {
+    sa868.sleep();
+    digitalWrite(OLED_POWER_PIN, LOW);
+}
+
+
+void buttonOKLongPressCallbackDeepSleep() {
+    esp_sleep_enable_ext1_wakeup(((uint64_t)(((uint64_t)1)<<ENCODER_OK_PIN)), ESP_EXT1_WAKEUP_ALL_LOW);
+    esp_deep_sleep_start();
+}
+
+
+void buttonOKLongPressCallbackScreenOn() {
+    buttonOK.attachLongPressStart(buttonOKLongPressCallbackScreenOff);
+    sa868.wake();
+    digitalWrite(OLED_POWER_PIN, HIGH);
+}
+
+
+void print_wakeup_reason()
+{
+    esp_sleep_wakeup_cause_t wakeup_reason;
+
+    wakeup_reason = esp_sleep_get_wakeup_cause();
+
+    switch (wakeup_reason) {
+        case ESP_SLEEP_WAKEUP_EXT0:
+            Serial.println("Wakeup caused by external signal using RTC_IO");
+        break;
+
+        case ESP_SLEEP_WAKEUP_EXT1:
+            Serial.println("Wakeup caused by external signal using RTC_CNTL");
+        break;
+
+        case ESP_SLEEP_WAKEUP_TIMER:
+            Serial.println("Wakeup caused by timer");
+        break;
+
+        case ESP_SLEEP_WAKEUP_TOUCHPAD:
+            Serial.println("Wakeup caused by touchpad");
+        break;
+
+        case ESP_SLEEP_WAKEUP_ULP:
+            Serial.println("Wakeup caused by ULP program");
+        break;
+
+        default:
+            Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+        break;
+    }
 }
 
 /******************************************************************************/

@@ -1,0 +1,51 @@
+#pragma once
+
+/**
+ * UHF band: 400 ~ 480 MHz
+ */
+#define UHF_BAND 1
+
+/**
+ * 350 band: 320 ~ 400MHz
+ */
+// #define _350_BAND 1
+
+/**
+ * VHF band: 134 ~ 174MHz
+ */
+// #define VHF_BAND 1
+
+#if UHF_BAND
+#define MIN_FREQ (400.0)
+#define MAX_FREQ (480.0)
+#define FREQ_RANGE (80)
+#define DEFAULT_TRANSFREQ MIN_FREQ
+#endif
+
+
+#if _350_BAND
+#define MIN_FREQ (320.0)
+#define MAX_FREQ (400.0)
+#define FREQ_RANGE (80)
+#define DEFAULT_TRANSFREQ MIN_FREQ
+#endif
+
+
+#if VHF_BAND
+#define MIN_FREQ (134.0)
+#define MAX_FREQ (174.0)
+#define FREQ_RANGE (40)
+#define DEFAULT_TRANSFREQ MIN_FREQ
+#endif
+
+
+#define CONFIG_DATA_DEFAULT_BANDWIDTH (false)
+#define CONFIG_DATA_DEFAULT_TRANSFREQ DEFAULT_TRANSFREQ
+#define CONFIG_DATA_DEFAULT_RECVFREQ  DEFAULT_TRANSFREQ
+#define CONFIG_DATA_DEFAULT_TXCXCSS   (0)
+#define CONFIG_DATA_DEFAULT_SQ        (4)
+#define CONFIG_DATA_DEFAULT_RXCXCSS   (0)
+#define CONFIG_DATA_DEFAULT_VOLUME    (4)
+#define CONFIG_DATA_DEFAULT_EMPHASIS  (true)
+#define CONFIG_DATA_DEFAULT_HIGHPASS  (true)
+#define CONFIG_DATA_DEFAULT_LOWPASS   (true)

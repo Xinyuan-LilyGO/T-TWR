@@ -3,6 +3,7 @@
 /******************************************************************************/
 
 #include "data.h"
+#include "config.h"
 
 #include <ArduinoJson.h>
 
@@ -19,17 +20,6 @@
 #define WARN_TAG "W [Data]: "
 #define INFO_TAG "I [Data]: "
 
-#define CONFIG_DATA_DEFAULT_BANDWIDTH (false)
-#define CONFIG_DATA_DEFAULT_TRANSFREQ (415.1250)
-#define CONFIG_DATA_DEFAULT_RECVFREQ  (415.1250)
-#define CONFIG_DATA_DEFAULT_TXCXCSS   (0)
-#define CONFIG_DATA_DEFAULT_SQ        (4)
-#define CONFIG_DATA_DEFAULT_RXCXCSS   (0)
-#define CONFIG_DATA_DEFAULT_VOLUME    (4)
-#define CONFIG_DATA_DEFAULT_EMPHASIS  (true)
-#define CONFIG_DATA_DEFAULT_HIGHPASS  (true)
-#define CONFIG_DATA_DEFAULT_LOWPASS   (true)
-
 /******************************************************************************/
 /***        type definitions                                                ***/
 /******************************************************************************/
@@ -37,7 +27,6 @@
 /******************************************************************************/
 /***        local function prototypes                                       ***/
 /******************************************************************************/
-
 
 /******************************************************************************/
 /***        exported variables                                              ***/
