@@ -12,7 +12,7 @@ void setup() {
     delay(1000);
 
     pinMode(CONFIG_SA868_PTT_PIN, OUTPUT);
-    digitalWrite(CONFIG_SA868_PTT_PIN, LOW);
+    digitalWrite(CONFIG_SA868_PTT_PIN, HIGH);
 
     pinMode(CONFIG_SA868_RF_PIN, OUTPUT);
     digitalWrite(CONFIG_SA868_RF_PIN, LOW);

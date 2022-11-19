@@ -313,7 +313,7 @@ void buttonOKClickCallbackSettingsPage() {
         // trans freq setting
         curPage = 4;
         feedSettingsPagebarTransFreqPage();
-        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.transFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
+        feedSettingsPagebarTransFreqPageCXCSSList1(sa868.transFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
         if (sa868.bandwidth) {
             feedSettingsPagebarTransFreqPageCXCSSList2(sa868.transFreq, 25000);
         } else {
@@ -328,8 +328,7 @@ void buttonOKClickCallbackSettingsPage() {
         // recv freq setting
         curPage = 5;
         feedSettingsPagebarRecvFreqPage();
-        feedSettingsPagebarTransFreqPageCXCSSList1((long long)sa868.recvFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
-        // long long t = (long long)sa868.recvFreq;
+        feedSettingsPagebarTransFreqPageCXCSSList1(sa868.recvFreq, sa868.bandwidth, MIN_FREQ, MAX_FREQ);
         if (sa868.bandwidth) {
             feedSettingsPagebarTransFreqPageCXCSSList2(sa868.recvFreq, 25000);
         } else {
