@@ -847,11 +847,14 @@ void feedRecvFreq(long long freq) {
 
     sprintf(buf, "%03ld", freq / (1000 * 1000));
     u8g2.setFont(u8g2_font_courB18_tf);
-    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 7, 10 + 26, buf);
+    int8_t height = 16 + u8g2.getAscent();
+    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 7, height, buf);
+    height += abs(u8g2.getDescent());
+
     u8g2.setFont(u8g2_font_courB12_tf);
-    // long long t = (long long)freq;
+    height += u8g2.getAscent();
     sprintf(buf, "%04d", (freq % (1000 * 1000)) / 100);
-    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 8, 10 + 26 + 17 , buf);
+    u8g2.drawStr(CONFIG_MAIN_PAGE_TRANSMIT_STATUS_X + 8, height, buf);
 }
 
 

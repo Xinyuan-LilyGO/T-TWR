@@ -266,6 +266,19 @@ void ui() {
     feedElectricity(getBatteryPercentage());
     feedTxCXCSS(cxcss[sa868.txCXCSS]);
     feedRxCXCSS(cxcss[sa868.rxCXCSS]);
+    u8g2.setFont(u8g2_font_tenstamps_mf);
+    if (sa868.emphasis) {
+        u8g2.drawStr(32, 60, "E");
+    }
+    if (sa868.highPass) {
+        u8g2.drawStr(48, 60, "H");
+    }
+    if (sa868.lowPass) {
+        u8g2.drawStr(64, 60, "L");
+    }
+    char sq_str[2] = { 0 };
+    sprintf(sq_str, "%d", sa868.sq);
+    u8g2.drawStr(80, 60, sq_str);
     u8g2.sendBuffer();
     encoderFn = encoderCallbackMainPage;
 }
@@ -764,14 +777,7 @@ void buttonOKClickCallbackMainPage()
 void buttonOKDoubleClickCallbackMainPage() {
     Serial.println("I [Main]: Ok button double click");
     curPage = 0;
-    feedMainPage();
-    feedRecvFreq(sa868.recvFreq);
-    feedElectricity(getBatteryPercentage());
-    feedRSSI(sa868.getRSSI());
-    feedTxCXCSS(cxcss[sa868.txCXCSS]);
-    feedRxCXCSS(cxcss[sa868.rxCXCSS]);
-    u8g2.sendBuffer();
-    encoderFn = encoderCallbackMainPage;
+    ui();
     buttonOK.attachClick(buttonOKClickCallbackMainPage);
 }
 
