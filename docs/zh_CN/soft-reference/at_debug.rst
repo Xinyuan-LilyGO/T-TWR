@@ -53,7 +53,7 @@ BUTTON_PTT_PIN  38   发射/接收按钮
 * `SA868`_ (Datasheet)
 
 .. _ESP32-S3-WROOM-1-N16R8: https://www.espressif.com.cn/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf
-.. _SA868: ../../../../datasheet/SA868 2W嵌入式小体积对讲机模块V1.2.pdf
+.. _SA868: https://github.com/Xinyuan-LilyGO/T-TWR/blob/master/datasheet/SA868%202W%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%B0%8F%E4%BD%93%E7%A7%AF%E5%AF%B9%E8%AE%B2%E6%9C%BA%E6%A8%A1%E5%9D%97V1.2.pdf
 
 Troubleshooting
 ================
