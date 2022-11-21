@@ -3,7 +3,7 @@
 /**
  * UHF band: 400 ~ 480 MHz
  */
-// #define UHF_BAND 1
+ #define UHF_BAND 1
 
 /**
  * 350 band: 320 ~ 400MHz
