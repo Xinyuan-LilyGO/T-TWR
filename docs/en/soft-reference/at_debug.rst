@@ -58,7 +58,7 @@ Datasheet
 * `SA868`_ (Datasheet)
 
 .. _ESP32-S3-WROOM-1-N16R8: https://www.espressif.com.cn/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf
-.. _SA868: ../../../../datasheet/SA868 2W Embedded walkie talkie moduleV1.2.pdf
+.. _SA868: https://github.com/Xinyuan-LilyGO/T-TWR/blob/master/datasheet/SA868%202W%20Embedded%20walkie%20talkie%20moduleV1.2.pdf
 
 Troubleshooting
 ================
