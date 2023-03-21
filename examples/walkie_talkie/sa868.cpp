@@ -46,11 +46,13 @@ void SA868::wake() {
 
 
 void SA868::highPower() {
-    digitalWrite(_rfPin, HIGH);
+      //! Setting the high power cannot set the SA868 RF Pin to HIGH, otherwise the chip will heat up
+    pinMode(_rfPin, OPEN_DRAIN);
 }
 
 
 void SA868::lowPower() {
+    pinMode(_rfPin, OUTPUT);
     digitalWrite(_rfPin, LOW);
 }
 

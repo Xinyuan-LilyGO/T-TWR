@@ -155,9 +155,9 @@ public:
     /**
      * constructor
      *
-     * @param[in] pttPin 发射/接收控制脚， “0” 为发射； “1” 为接收， 默认接收模式
-     * @param[in] pdPin 模块休眠使能， “0” 或者悬空为休眠； “1” 为正常工作
-     * @param[in] rfPin 高低功率控制； 接地为低功率， 悬空为高功率， 默认高功率
+     * @param[in] pttPin The transmit/receive control pin, where "0" refers to transmit; "1" refers to receiving, and the default receiving mode is
+     * @param[in] pdPin Module hibernation enable, "0" or suspended as hibernation; "1" means normal operation
+     * @param[in] rfPin High and low power control; Ground is low power, suspended is high power, default is high power, cannot be set to HIGH
      */
     SA868(Stream& stream, uint8_t pttPin, uint8_t pdPin, uint8_t rfPin);
     ~SA868();
