@@ -2,4 +2,4 @@
 
 | Version Information | Schematic                  |
 | ------------------- | -------------------------- |
-| T-TWR 1.3           | [T-TWR_1.3](T-TWR_1.3.pdf) |
+| T-TWR 1.x           | [T-TWR_1.x](T-TWR_1.x.pdf) |
