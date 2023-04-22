@@ -79,8 +79,23 @@ int vref = 1100;
 /******************************************************************************/
 /***        exported functions                                              ***/
 /******************************************************************************/
+void  print_wakeup_reason();
+void app_nvs_init();
+void adc_init();
+void volumeUp();
+void volumeDown();
+void buttonOKClickCallbackMainPage();
+void buttonOKLongPressCallbackScreenOff();
+void buttonOKLongPressCallbackDeepSleep();
+void transmit();
+void receive();
+void encoderTask(void *pvParameters);
+void updateTask(void *pvParameters);
+void dataTask(void *pvParameters);
+void clearvolumeSliderTask(void *pvParameters);
 
-void setup() {
+void setup()
+{
     Serial.begin(115200);
     delay(1000);
 
@@ -135,8 +150,7 @@ void app_nvs_init(void)
 {
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
@@ -144,7 +158,8 @@ void app_nvs_init(void)
 }
 
 
-void adc_init() {
+void adc_init()
+{
     esp_adc_cal_characteristics_t adc_chars;
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
     if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
@@ -154,7 +169,8 @@ void adc_init() {
 }
 
 
-uint8_t getBatteryPercentage() {
+uint8_t getBatteryPercentage()
+{
     esp_adc_cal_characteristics_t adc_chars;
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
     uint32_t v = esp_adc_cal_raw_to_voltage(analogRead(BATTERY_ADC_PIN), &adc_chars);
@@ -171,7 +187,8 @@ uint8_t getBatteryPercentage() {
 }
 
 
-void updateTask(void *pvParameters) {
+void updateTask(void *pvParameters)
+{
     while (1) {
         if (curPage == 0) {
             feedElectricity(getBatteryPercentage());
@@ -184,7 +201,8 @@ void updateTask(void *pvParameters) {
 }
 
 
-void dataTask(void *pvParameter) {
+void dataTask(void *pvParameter)
+{
     vTaskSuspend(dataTaskHandler);
     while (1) {
         data_save(sa868);
@@ -195,7 +213,8 @@ void dataTask(void *pvParameter) {
 }
 
 
-void clearvolumeSliderTask(void *pvParameter) {
+void clearvolumeSliderTask(void *pvParameter)
+{
     vTaskSuspend(clearvolumeSliderTaskHandler);
     while (1) {
         delay(1500);
@@ -207,7 +226,8 @@ void clearvolumeSliderTask(void *pvParameter) {
 }
 
 
-void loop() {
+void loop()
+{
     buttonOK.tick();
     buttonUp.tick();
     buttonDown.tick();
@@ -216,7 +236,8 @@ void loop() {
 }
 
 
-void transmit() {
+void transmit()
+{
     if (curPage == 0) {
         sa868.transmit();
         feedTransmitStatus();
@@ -225,7 +246,8 @@ void transmit() {
 }
 
 
-void receive() {
+void receive()
+{
     if (curPage == 0) {
         sa868.receive();
         feedRecvFreq(sa868.recvFreq);
@@ -234,7 +256,8 @@ void receive() {
 }
 
 
-void encoderTask(void *pvParameters) {
+void encoderTask(void *pvParameters)
+{
     int pos = 0;
 
     while (1) {
@@ -246,7 +269,7 @@ void encoderTask(void *pvParameters) {
                 if (newPos > pos) {
                     encoderFn((void *)1);
                 } else {
-                    encoderFn((void *)-1);
+                    encoderFn((void *) -1);
                 }
             }
             pos = newPos;
@@ -258,7 +281,8 @@ void encoderTask(void *pvParameters) {
 }
 
 
-void ui() {
+void ui()
+{
     feedSettingsMenu(false);
     feedFilterMenu(false);
     feedRecvFreq(sa868.recvFreq);
@@ -284,7 +308,8 @@ void ui() {
 }
 
 
-void volumeUp() {
+void volumeUp()
+{
     vTaskSuspend(clearvolumeSliderTaskHandler);
     sa868.setVolume(sa868.volume + 1);
     vTaskResume(dataTaskHandler);
@@ -294,7 +319,8 @@ void volumeUp() {
 }
 
 
-void volumeDown() {
+void volumeDown()
+{
     vTaskSuspend(clearvolumeSliderTaskHandler);
     sa868.setVolume(sa868.volume - 1);
     vTaskResume(dataTaskHandler);
@@ -305,7 +331,8 @@ void volumeDown() {
 
 
 // settings page
-void buttonOKClickCallbackSettingsPage() {
+void buttonOKClickCallbackSettingsPage()
+{
     lastCursor = curCursor;
     if (curCursor == 0) {
         // band width setting
@@ -386,7 +413,8 @@ void buttonOKClickCallbackSettingsPage() {
 }
 
 
-void encoderCallbackSettingsPage(void *pvParameters) {
+void encoderCallbackSettingsPage(void *pvParameters)
+{
     curCursor = curCursor + (int)pvParameters;
 
     if (curCursor > 5) {
@@ -400,7 +428,8 @@ void encoderCallbackSettingsPage(void *pvParameters) {
 }
 
 
-void buttonOKDoubleClickCallbackSettingsPage() {
+void buttonOKDoubleClickCallbackSettingsPage()
+{
     curPage = 1;
     curCursor = lastCursor;
     encoderFn = encoderCallbackSettingsPage;
@@ -413,7 +442,8 @@ void buttonOKDoubleClickCallbackSettingsPage() {
 
 
 // bandwidth page
-void buttonOKClickCallbackBandwidthPage() {
+void buttonOKClickCallbackBandwidthPage()
+{
     sa868.bandwidth = curCursor == 0 ? false : true;
     curPage = 1;
     curCursor = lastCursor;
@@ -426,7 +456,8 @@ void buttonOKClickCallbackBandwidthPage() {
 }
 
 
-void encoderCallbackBandWidthPage(void *pvParameters) {
+void encoderCallbackBandWidthPage(void *pvParameters)
+{
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
@@ -437,18 +468,18 @@ void encoderCallbackBandWidthPage(void *pvParameters) {
     }
     curCursor = pos;
     switch (curCursor) {
-        case 0:
-            feedSettingsPagebarBandWidthPageBar1(true);
-            feedSettingsPagebarBandWidthPageBar2(false);
-            break;
+    case 0:
+        feedSettingsPagebarBandWidthPageBar1(true);
+        feedSettingsPagebarBandWidthPageBar2(false);
+        break;
 
-        case 1:
-            feedSettingsPagebarBandWidthPageBar1(false);
-            feedSettingsPagebarBandWidthPageBar2(true);
-            break;
+    case 1:
+        feedSettingsPagebarBandWidthPageBar1(false);
+        feedSettingsPagebarBandWidthPageBar2(true);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
     u8g2.sendBuffer();
 }
@@ -456,7 +487,8 @@ void encoderCallbackBandWidthPage(void *pvParameters) {
 long long tempFreq = 0.0;
 
 // TransFreq Page
-void buttonOKClickCallbackTransFreqPage1() {
+void buttonOKClickCallbackTransFreqPage1()
+{
     tempFreq = MIN_FREQ + curCursor * 1000 * 1000;
     if (sa868.bandwidth) {
         curCursor = (sa868.transFreq % (1000 * 1000)) / 25000;
@@ -468,11 +500,12 @@ void buttonOKClickCallbackTransFreqPage1() {
 }
 
 
-void encoderCallbackTransFreqPage1(void *pvParameters) {
+void encoderCallbackTransFreqPage1(void *pvParameters)
+{
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
-    if (pos > FREQ_RANGE -1) {
+    if (pos > FREQ_RANGE - 1) {
         pos = 0;
     } else if (pos < 0) {
         pos = FREQ_RANGE - 1;
@@ -483,7 +516,8 @@ void encoderCallbackTransFreqPage1(void *pvParameters) {
 }
 
 
-void buttonOKClickCallbackTransFreqPage2() {
+void buttonOKClickCallbackTransFreqPage2()
+{
     if (sa868.bandwidth) {
         tempFreq = tempFreq + curCursor * 25000 ;
     } else {
@@ -508,14 +542,15 @@ void buttonOKClickCallbackTransFreqPage2() {
 }
 
 
-void encoderCallbackTransFreqPage2(void *pvParameters) {
+void encoderCallbackTransFreqPage2(void *pvParameters)
+{
     int pos = curCursor;
     int range = 0;
     pos = pos + (int)pvParameters;
     if (sa868.bandwidth) {
         range = (1 * 1000 * 1000 / 25000) - 1;
     } else {
-        range= (1 * 1000 * 1000 / 12500) - 1;
+        range = (1 * 1000 * 1000 / 12500) - 1;
     }
     if (pos > range) {
         pos = 0;
@@ -534,7 +569,8 @@ void encoderCallbackTransFreqPage2(void *pvParameters) {
 
 
 // recv page
-void buttonOKClickCallbackRecvFreqPage1() {
+void buttonOKClickCallbackRecvFreqPage1()
+{
     tempFreq = MIN_FREQ + curCursor * 1000 * 1000;
 
     if (sa868.bandwidth) {
@@ -548,7 +584,8 @@ void buttonOKClickCallbackRecvFreqPage1() {
 }
 
 
-void buttonOKClickCallbackRecvFreqPage2() {
+void buttonOKClickCallbackRecvFreqPage2()
+{
     if (sa868.bandwidth) {
         tempFreq = tempFreq + curCursor * 25000 ;
     } else {
@@ -584,7 +621,8 @@ void buttonOKClickCallbackRecvFreqPage2() {
 
 
 //TXCXCSS page
-void buttonOKClickCallbackTXCXCSSPage() {
+void buttonOKClickCallbackTXCXCSSPage()
+{
     // sa868.txCXCSS = curCursor;
     sa868.setGroup(sa868.bandwidth,
                    sa868.transFreq,
@@ -604,7 +642,8 @@ void buttonOKClickCallbackTXCXCSSPage() {
 }
 
 
-void encoderCallbackTXCXCSSPage(void *pvParameters) {
+void encoderCallbackTXCXCSSPage(void *pvParameters)
+{
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
@@ -622,7 +661,8 @@ void encoderCallbackTXCXCSSPage(void *pvParameters) {
 
 
 // SQ page
-void buttonOKClickCallbackSQPage() {
+void buttonOKClickCallbackSQPage()
+{
     // sa868.sq = curCursor;
     sa868.setGroup(sa868.bandwidth,
                    sa868.transFreq,
@@ -642,7 +682,8 @@ void buttonOKClickCallbackSQPage() {
 }
 
 
-void encoderCallbackSQPage(void *pvParameters) {
+void encoderCallbackSQPage(void *pvParameters)
+{
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
@@ -660,7 +701,8 @@ void encoderCallbackSQPage(void *pvParameters) {
 
 
 //RXCXCSS page
-void buttonOKClickCallbackRXCXCSSPage() {
+void buttonOKClickCallbackRXCXCSSPage()
+{
     // sa868.rxCXCSS = curCursor;
     sa868.setGroup(sa868.bandwidth, sa868.transFreq, sa868.recvFreq, (teCXCSS)sa868.txCXCSS, sa868.sq, (teCXCSS)curCursor);
     vTaskResume(dataTaskHandler);
@@ -675,7 +717,8 @@ void buttonOKClickCallbackRXCXCSSPage() {
 }
 
 
-void encoderCallbackRXCXCSSPage(void *pvParameters) {
+void encoderCallbackRXCXCSSPage(void *pvParameters)
+{
     int pos = curCursor;
 
     pos = pos + (int)pvParameters;
@@ -693,7 +736,8 @@ void encoderCallbackRXCXCSSPage(void *pvParameters) {
 
 
 // filter page
-void buttonOKClickCallbackFilterPage() {
+void buttonOKClickCallbackFilterPage()
+{
     if (curCursor == 0) {
         feedFilterPageBar1(true, !sa868.emphasis);
         sa868.setFilter(!sa868.emphasis, sa868.highPass, sa868.lowPass);
@@ -709,7 +753,8 @@ void buttonOKClickCallbackFilterPage() {
 }
 
 
-void encoderCallbackFilterPage(void *pvParameters) {
+void encoderCallbackFilterPage(void *pvParameters)
+{
     // static int pos = 0;
 
     curCursor = curCursor + (int)pvParameters;
@@ -720,26 +765,26 @@ void encoderCallbackFilterPage(void *pvParameters) {
     }
     // curCursor = pos;
     switch (curCursor) {
-        case 0:
-            feedFilterPageBar1(true, sa868.emphasis);
-            feedFilterPageBar2(false, sa868.highPass);
-            feedFilterPageBar3(false, sa868.lowPass);
-            break;
+    case 0:
+        feedFilterPageBar1(true, sa868.emphasis);
+        feedFilterPageBar2(false, sa868.highPass);
+        feedFilterPageBar3(false, sa868.lowPass);
+        break;
 
-        case 1:
-            feedFilterPageBar1(false, sa868.emphasis);
-            feedFilterPageBar2(true, sa868.highPass);
-            feedFilterPageBar3(false, sa868.lowPass);
-            break;
+    case 1:
+        feedFilterPageBar1(false, sa868.emphasis);
+        feedFilterPageBar2(true, sa868.highPass);
+        feedFilterPageBar3(false, sa868.lowPass);
+        break;
 
-        case 2:
-            feedFilterPageBar1(false, sa868.emphasis);
-            feedFilterPageBar2(false, sa868.highPass);
-            feedFilterPageBar3(true, sa868.lowPass);
-            break;
+    case 2:
+        feedFilterPageBar1(false, sa868.emphasis);
+        feedFilterPageBar2(false, sa868.highPass);
+        feedFilterPageBar3(true, sa868.lowPass);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
     u8g2.sendBuffer();
 }
@@ -774,7 +819,8 @@ void buttonOKClickCallbackMainPage()
 }
 
 
-void buttonOKDoubleClickCallbackMainPage() {
+void buttonOKDoubleClickCallbackMainPage()
+{
     Serial.println("I [Main]: Ok button double click");
     curPage = 0;
     ui();
@@ -782,7 +828,8 @@ void buttonOKDoubleClickCallbackMainPage() {
 }
 
 
-void encoderCallbackMainPage(void *pvParameters) {
+void encoderCallbackMainPage(void *pvParameters)
+{
     static int pos = 0;
 
     pos = pos + (int)pvParameters;
@@ -793,38 +840,41 @@ void encoderCallbackMainPage(void *pvParameters) {
     }
 
     switch (pos) {
-        case 0:
-            feedSettingsMenu(true);
-            feedFilterMenu(false);
-            curCursor = 0;
-            break;
+    case 0:
+        feedSettingsMenu(true);
+        feedFilterMenu(false);
+        curCursor = 0;
+        break;
 
-        case 1:
-            feedSettingsMenu(false);
-            feedFilterMenu(true);
-            curCursor = 1;
-            break;
+    case 1:
+        feedSettingsMenu(false);
+        feedFilterMenu(true);
+        curCursor = 1;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
     u8g2.sendBuffer();
 }
 
 
-void buttonOKLongPressCallbackScreenOff() {
+void buttonOKLongPressCallbackScreenOff()
+{
     sa868.sleep();
     digitalWrite(OLED_POWER_PIN, LOW);
 }
 
 
-void buttonOKLongPressCallbackDeepSleep() {
-    esp_sleep_enable_ext1_wakeup(((uint64_t)(((uint64_t)1)<<ENCODER_OK_PIN)), ESP_EXT1_WAKEUP_ALL_LOW);
+void buttonOKLongPressCallbackDeepSleep()
+{
+    esp_sleep_enable_ext1_wakeup(((uint64_t)(((uint64_t)1) << ENCODER_OK_PIN)), ESP_EXT1_WAKEUP_ALL_LOW);
     esp_deep_sleep_start();
 }
 
 
-void buttonOKLongPressCallbackScreenOn() {
+void buttonOKLongPressCallbackScreenOn()
+{
     buttonOK.attachLongPressStart(buttonOKLongPressCallbackScreenOff);
     sa868.wake();
     digitalWrite(OLED_POWER_PIN, HIGH);
@@ -838,28 +888,28 @@ void print_wakeup_reason()
     wakeup_reason = esp_sleep_get_wakeup_cause();
 
     switch (wakeup_reason) {
-        case ESP_SLEEP_WAKEUP_EXT0:
-            Serial.println("Wakeup caused by external signal using RTC_IO");
+    case ESP_SLEEP_WAKEUP_EXT0:
+        Serial.println("Wakeup caused by external signal using RTC_IO");
         break;
 
-        case ESP_SLEEP_WAKEUP_EXT1:
-            Serial.println("Wakeup caused by external signal using RTC_CNTL");
+    case ESP_SLEEP_WAKEUP_EXT1:
+        Serial.println("Wakeup caused by external signal using RTC_CNTL");
         break;
 
-        case ESP_SLEEP_WAKEUP_TIMER:
-            Serial.println("Wakeup caused by timer");
+    case ESP_SLEEP_WAKEUP_TIMER:
+        Serial.println("Wakeup caused by timer");
         break;
 
-        case ESP_SLEEP_WAKEUP_TOUCHPAD:
-            Serial.println("Wakeup caused by touchpad");
+    case ESP_SLEEP_WAKEUP_TOUCHPAD:
+        Serial.println("Wakeup caused by touchpad");
         break;
 
-        case ESP_SLEEP_WAKEUP_ULP:
-            Serial.println("Wakeup caused by ULP program");
+    case ESP_SLEEP_WAKEUP_ULP:
+        Serial.println("Wakeup caused by ULP program");
         break;
 
-        default:
-            Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+    default:
+        Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
         break;
     }
 }
