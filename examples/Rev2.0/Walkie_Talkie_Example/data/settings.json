@@ -1,0 +1,16 @@
+{
+    "band": {
+        "bandwidth": false,
+        "transFreq": 134.0,
+        "recvFreq": 134.0,
+        "txCXCSS": 0,
+        "sq": 4,
+        "rxCXCSS": 0
+    },
+    "volume": 4,
+    "filter": {
+        "emphasis": true,
+        "highPass": true,
+        "lowPass": true
+    }
+}
