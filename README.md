@@ -46,7 +46,7 @@
           
     1. If you use a USBC cable with low quality or too large or too long wire resistance, there will be a large internal resistance, and there is no rated 5V input on the board, so the PMU will think that the power supply voltage is insufficient, so the rated charging current cannot be reached. ,The solution is to replace the high-quality USBC wire, reduce the length of the wire to meet the requirements of the PMU input voltage
     2. You can measure the voltage at both ends of the figure below to see if it can meet the 5V input voltage required by the PMU
-       ![](./docs/_static/input-voltage.jpg)
+      <img width="320"  src=docs/_static/input-voltage.jpg>
        
    1. Please note that if the charging current is set to 1A, please install a suitable heat sink above the PMU to reduce the risk of heat and damage caused by overheating.
 
