@@ -34,8 +34,7 @@
     ```
     > Solution
       - Press and hold the **BOOT** button (without releasing it), then press the **RST** button, then release the **RST** button, and finally release the **BOOT** button
-      - Then press and hold the **BOOT** button (without releasing it), then press the **PWR** button for one second, release the **PWR** button, and finally release the **BOOT** button
-      - Click the upload image in the IDE and wait for the upload to complete
+      - Click the upload button in the IDE and wait for the upload to complete
       - Press the **RST** button to exit the download mode
       
 2. ⚠ **Can I change the voltage of the peripheral?**
