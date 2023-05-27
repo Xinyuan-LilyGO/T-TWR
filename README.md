@@ -33,6 +33,7 @@
 
     ```
     > Solution
+      - Press the **PWR** button for one second to make sure the TWR is powered on
       - Press and hold the **BOOT** button (without releasing it), then press the **RST** button, then release the **RST** button, and finally release the **BOOT** button
       - Click the upload button in the IDE and wait for the upload to complete
       - Press the **RST** button to exit the download mode
