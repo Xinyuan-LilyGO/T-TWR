@@ -9,9 +9,47 @@
 
 ###  The following content explains the precautions and solutions to problems of **TWR Plus 2.0**
 
-**TWR Plus 2.0 FAQ**:
+## 1️⃣ PlatformIO Quick Start
 
-1. ⚠ **Unable to download the program, the error is shown below.**
+1. Install [Visual Studio Code](https://code.visualstudio.com/) and [Python](https://www.python.org/)
+2. Search for the `PlatformIO` plugin in the `VisualStudioCode` extension and install it.
+3. After the installation is complete, you need to restart `VisualStudioCode`
+4. After restarting `VisualStudioCode`, select `File` in the upper left corner of `VisualStudioCode` -> `Open Folder` -> select the `T-TWR` directory
+5. Click on the `platformio.ini` file, and in the `platformio` column, cancel the sample line that needs to be used, please make sure that only one line is valid
+6. Click the (✔) symbol in the lower left corner to compile
+7. Connect the board to the computer USB
+8. Click (→) to upload firmware
+9. Click (plug symbol) to monitor serial output
+
+
+## 2️⃣ Arduino IDE Quick Start
+
+1. Install [Arduino IDE](https://www.arduino.cc/en/software)
+2. Install [Arduino ESP32](https://docs.espressif.com/projects/arduino-esp32/en/latest/) 
+3. Copy all the folders in the `T-TWR/lib` directory to `<C:\Users\UserName\Documents\Arduino\libraries>`. If there is no `libraries` directory, please create a new one. Please note that you are not copying the `lib` directory, but copying the folders in the lib directory
+4. Open ArduinoIDE -> Tools
+   - Board -> ESP32S3 Dev Module
+   - USB CDC On Boot -> Enable  ## Note that you need to change Enable to Disable when USB is not connected, so USB CDC will not prevent the board from starting
+   - CPU Frequency -> 240MHz
+   - USB DFU On Boot -> Disable
+   - Flash Mode -> QIO 80MHz
+   - Flash Size -> 16MB(128Mb)
+   - USB Firmware MSC On Boot -> Disable
+   - PSRAM -> OPI PSRAM
+   - Partition Scheme -> 16M Flash(3MB APP/9.9MB FATFS)
+   - USB Mode -> Hardware CDC and JIAG
+   - Upload Mode -> UART0/Hardware CDC
+   - Upload Speed -> 921600
+5. Insert USB into the PC and click Upload <If the upload fails, View the FAQ below>
+
+
+## 3️⃣ FAQ:
+
+1. ⚠⚠⚠ **Precautions (special matters)**:
+    1. The **glue stick (RF) antenna** must be connected. If the antenna is not connected, the RF module may be damaged, and the PMU will automatically turn off the power output
+    2. A separate USB power supply may not meet the power supply requirements, please connect the battery to use
+ 
+ 2. ⚠ **Unable to download the program, the error is shown below.**
    
     ```shell
     Flash: [====      ]  35.7% (used 467813 bytes from 1310720 bytes)
