@@ -88,7 +88,7 @@
        
    1. Please note that if the charging current is set to 1A, please install a suitable heat sink above the PMU to reduce the risk of heat and damage caused by overheating.
 
-4.  ⚠  When you think there is a problem with the board, you can try to burn our [factory firmware](./firmware/twr-plus%202.0/README.MD) for testing, you can first rule out whether it is a hardware problem
+4.  ⚠  When you think there is a problem with the board, you can try to burn our [factory firmware](./firmware/README.MD) for testing, you can first rule out whether it is a hardware problem
 
 
 5. ⚠ **There is a microphone port on the bottom of the board, do I need to install a microphone?**
