@@ -100,7 +100,7 @@
  7. ⚠ **Can't turn on automatically after connecting the battery?**
       1. Connect the battery separately, you need to press the **PWR button** for one second, the board will start the action, press and hold the **PWR** button for 6 seconds to shut down, the shutdown time can be set by software
 
-
+8. TWR currently has two modes before leaving the factory, one is flashed with regular firmware and uses the esp built-in boot, and the other uses TinyUF2 as the boot program. For novices, please [see here](./firmware/README.MD)
 
 
 
