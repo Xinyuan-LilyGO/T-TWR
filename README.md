@@ -102,7 +102,10 @@
 
 8. TWR currently has two modes before leaving the factory, one is flashed with regular firmware and uses the esp built-in boot, and the other uses TinyUF2 as the boot program. For novices, please [see here](./firmware/README.MD)
 
-
+9. How to enter TinyUF2 boot mode?
+   * Before entering tinyUF2, the boot program must have been flashed. If it has not been written, [please see here](./firmware/README.MD)
+   * Press the RST button
+   * After pressing the RST button for one second, press the BOOT button. The disk will be ejected on the computer.
 
 
 
