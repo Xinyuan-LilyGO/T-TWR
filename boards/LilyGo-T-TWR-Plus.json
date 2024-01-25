@@ -8,7 +8,8 @@
       "core": "esp32",
       "extra_flags": [
         "-DBOARD_HAS_PSRAM",
-        "-DARDUINO_USB_MODE=1"
+        "-DARDUINO_USB_MODE=1",
+        "-DARDUINO_USB_CDC_ON_BOOT=1"
       ],
       "f_cpu": "240000000L",
       "f_flash": "80000000L",
@@ -33,7 +34,7 @@
       "arduino",
       "espidf"
     ],
-    "name": "LILYGO T-TWR",
+    "name": "LILYGO T-TWR Plus",
     "upload": {
       "flash_size": "16MB",
       "maximum_ram_size": 327680,
@@ -41,6 +42,6 @@
       "require_upload_port": true,
       "speed": 921600
     },
-    "url": "https://www.adafruit.com/product/5290",
+    "url": "https://www.lilygo.cc/products/t-twr-plus",
     "vendor": "LILYGO"
   }
