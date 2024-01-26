@@ -1,0 +1,44 @@
+{
+  "name": "LilyGo TWR Library",
+  "version": "0.0.1",
+  "description": "LilyGo T-TWR Arduino library",
+  "keywords": "lilygo,twr",
+  "authors": [
+    {
+      "name": "Xinyuan-LilyGO",
+      "url": "https://github.com/Xinyuan-LilyGO"
+    },
+    {
+      "name": "LewisHe",
+      "url": "https://github.com/lewisxhe",
+      "maintainer": true
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xinyuan-LilyGO/LilyGo_TWR_Library.git"
+  },
+  "homepage": "https://github.com/Xinyuan-LilyGO/LilyGo_TWR_Library",
+  "export": {
+    "include": [
+      "LICENSE",
+      "library.json",
+      "library.properties",
+      "README.md",
+      "keywords.txt",
+      "src/*",
+      "examples/*"
+    ]
+  },
+  "dependencies": [
+    {
+      "owner": "lewisxhe",
+      "name": "XPowersLib",
+      "version": "^0.2.1"
+    }
+  ],
+  "examples": ["examples/*/*.ino"],
+  "frameworks": ["arduino"],
+  "platforms": "esp32",
+  "headers": "LilyGo_RGBPanel.h"
+}
