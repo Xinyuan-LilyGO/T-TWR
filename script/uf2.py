@@ -17,7 +17,14 @@ from SCons.Script import COMMAND_LINE_TARGETS
 
 current_script_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 script_dir = os.path.dirname(current_script_path)
-uf2conv_tools_dir = script_dir + os.altsep + "uf2conv.py"
+
+uf2conv_tools_dir = None
+if sys.platform.startswith('linux'):
+    uf2conv_tools_dir = script_dir + "/uf2conv.py"
+elif sys.platform == 'win32':
+    uf2conv_tools_dir = script_dir + os.altsep + "uf2conv.py"
+elif sys.platform == 'darwin':
+    uf2conv_tools_dir = script_dir + "/uf2conv.py"
 
 
 def after_buildprog(source, target, env):
