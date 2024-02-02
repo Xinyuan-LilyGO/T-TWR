@@ -961,7 +961,7 @@ void demoAlarm(uint8_t menuSelec )
     Button   btnPressed;
     uint32_t prevTime   = 0;
     int value = 600;
-    twr.routingMicphoneChannel(TWRClass::TWR_MIC_TO_ESP);
+    twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_ESP);
     radio.transmit();
 
     strip.setPixelColor(0, strip.Color(0, 255, 0));
@@ -995,14 +995,14 @@ void demoAlarm(uint8_t menuSelec )
 
         if (millis() > prevTime) {
             tone(ESP2SA868_MIC, value, 100);
-            prevTime = millis() + 300;
+            prevTime = millis() + 1000;
         }
 
     } while (btnPressed != LongPress);
 
     radio.receive();
 
-    twr.routingMicphoneChannel(TWRClass::TWR_MIC_TO_RADIO);
+    twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_RADIO);
 
     strip.clear();
     strip.show();
@@ -1018,7 +1018,7 @@ void demoMic( uint8_t menuSelec )
         drawError(menuSelec); return;
     }
 
-    twr.routingMicphoneChannel(TWRClass::TWR_MIC_TO_ESP);
+    twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_ESP);
 
 
     do {
@@ -1044,7 +1044,7 @@ void demoMic( uint8_t menuSelec )
         } while ( u8g2.nextPage() );
     } while ( btnPressed != LongPress );
 
-    twr.routingMicphoneChannel(TWRClass::TWR_MIC_TO_RADIO);
+    twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_RADIO);
 }
 
 void demoSensor( uint8_t menuSelec )

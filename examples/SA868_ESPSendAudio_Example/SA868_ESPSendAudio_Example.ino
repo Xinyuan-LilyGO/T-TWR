@@ -77,7 +77,7 @@ void setup()
     }
 
     //* Microphone will be routed to ESP ADC IO15 and the SA868 audio input will be routed to ESP IO18
-    twr.routingMicphoneChannel(TWRClass::TWR_MIC_TO_ESP);
+    twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_ESP);
 
     // Start transfer
     radio.transmit();
