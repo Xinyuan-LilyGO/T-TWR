@@ -66,7 +66,7 @@ void TWRClass::routingIO2Downloader(IOMUX_Channel ch)
     }
 }
 
-void TWRClass::routingMicphoneChannel(MIC_Channel ch)
+void TWRClass::routingMicrophoneChannel(MIC_Channel ch)
 {
     if (_version == TWR_REV2V0)return ;
     switch (ch) {
@@ -97,6 +97,54 @@ void TWRClass::routingSpeakerChannel(SPK_Channel ch)
         break;
     default:
         break;
+    }
+}
+
+void TWRClass::deviceScan(Stream *stream)
+{
+    uint8_t err, addr;
+    int nDevices = 0;
+    for (addr = 1; addr < 127; addr++) {
+        Wire.beginTransmission(addr);
+        err = Wire.endTransmission();
+        if (err == 0) {
+            if (stream) {
+                stream->print("I2C device found at address 0x");
+                if (addr < 16)
+                    stream->print("0");
+                stream->print(addr, HEX);
+                stream->println(" !");
+            }
+            switch (addr) {
+            case 0X3C:
+                DBG("Find OLED ADDRESS : 0X3C");
+                _oledAddress = 0x3C;
+                break;
+            case 0X3D:
+                DBG("Find OLED ADDRESS : 0X3D");
+                _oledAddress = 0X3D;
+                break;
+            default:
+                break;
+            }
+            nDevices++;
+        } else if (err == 4) {
+            if (stream) {
+                stream->print("Unknow error at address 0x");
+                if (addr < 16)
+                    stream->print("0");
+                stream->println(addr, HEX);
+            }
+        }
+    }
+    if (nDevices == 0) {
+        if (stream) {
+            stream->println("No I2C devices found\n");
+        }
+    } else {
+        if (stream) {
+            stream->println("Done\n");
+        }
     }
 }
 
@@ -190,37 +238,29 @@ bool TWRClass::begin(TWR_Model model)
 
     initPreferences();
 
-    routingMicphoneChannel(TWR_MIC_TO_RADIO);
+    routingMicrophoneChannel(TWR_MIC_TO_RADIO);
 
 
     if (XPowersAXP2101::isCharging()) {
         _isChargeStart = true;
     }
 
-    Wire.beginTransmission(0x3C);
-    if (Wire.endTransmission() == 0) {
-        _oledAddress = 0x3C;
-    }
-
-    Wire.beginTransmission(0x3D);
-    if (Wire.endTransmission() == 0) {
-        _oledAddress = 0x3D;
-    }
+    deviceScan(NULL);
 
     DBG("----------------------------------------------------------------------------");
-    DBG("DCDC1  : %s   Voltage:%u mV \n",  isEnableDC1()  ? "+" : "-", getDC1Voltage());
-    DBG("DCDC2  : %s   Voltage:%u mV \n",  isEnableDC2()  ? "+" : "-", getDC2Voltage());
-    DBG("DCDC3  : %s   Voltage:%u mV \n",  isEnableDC3()  ? "+" : "-", getDC3Voltage());
-    DBG("DCDC4  : %s   Voltage:%u mV \n",  isEnableDC4()  ? "+" : "-", getDC4Voltage());
-    DBG("DCDC5  : %s   Voltage:%u mV \n",  isEnableDC5()  ? "+" : "-", getDC5Voltage());
+    DBG("DCDC1  : ", isEnableDC1()  ? "+" : "-",  "Voltage:", getDC1Voltage(), "mV");
+    DBG("DCDC2  : ", isEnableDC2()  ? "+" : "-",  "Voltage:", getDC2Voltage(), "mV");
+    DBG("DCDC3  : ", isEnableDC3()  ? "+" : "-",  "Voltage:", getDC3Voltage(), "mV");
+    DBG("DCDC4  : ", isEnableDC4()  ? "+" : "-",  "Voltage:", getDC4Voltage(), "mV");
+    DBG("DCDC5  : ", isEnableDC5()  ? "+" : "-",  "Voltage:", getDC5Voltage(), "mV");
     DBG("----------------------------------------------------------------------------");
-    DBG("ALDO1  : %s   Voltage:%u mV\n",  isEnableALDO1()  ? "+" : "-", getALDO1Voltage());
-    DBG("ALDO2  : %s   Voltage:%u mV\n",  isEnableALDO2()  ? "+" : "-", getALDO2Voltage());
-    DBG("ALDO3  : %s   Voltage:%u mV\n",  isEnableALDO3()  ? "+" : "-", getALDO3Voltage());
-    DBG("ALDO4  : %s   Voltage:%u mV\n",  isEnableALDO4()  ? "+" : "-", getALDO4Voltage());
+    DBG("ALDO1  : ", isEnableALDO1()  ? "+" : "-", "Voltage:", getALDO1Voltage(), "mV");
+    DBG("ALDO2  : ", isEnableALDO2()  ? "+" : "-", "Voltage:", getALDO2Voltage(), "mV");
+    DBG("ALDO3  : ", isEnableALDO3()  ? "+" : "-", "Voltage:", getALDO3Voltage(), "mV");
+    DBG("ALDO4  : ", isEnableALDO4()  ? "+" : "-", "Voltage:", getALDO4Voltage(), "mV");
     DBG("----------------------------------------------------------------------------");
-    DBG("BLDO1  : %s   Voltage:%u mV\n",  isEnableBLDO1()  ? "+" : "-", getBLDO1Voltage());
-    DBG("BLDO2  : %s   Voltage:%u mV\n",  isEnableBLDO2()  ? "+" : "-", getBLDO2Voltage());
+    DBG("BLDO1  : ", isEnableBLDO1()  ? "+" : "-", "Voltage:", getBLDO1Voltage(), "mV");
+    DBG("BLDO2  : ", isEnableBLDO2()  ? "+" : "-", "Voltage:", getBLDO2Voltage(), "mV");
     DBG("----------------------------------------------------------------------------");
 
     return true;
@@ -233,7 +273,7 @@ bool TWRClass::saveConfigure()
         log_e("Write database failed!");
         return false;
     } else {
-        log_i("Write database successed!");
+        log_i("Write database succeeded!");
         return true;
     }
 }
@@ -575,7 +615,7 @@ bool TWRClass::initPreferences()
         if (write != sizeof(this->pdat)) {
             log_e("Write database failed!");
         } else {
-            log_i("Write database successed!");
+            log_i("Write database succeeded!");
         }
     }
     log_i("BEEP      :%u", this->pdat.beep);

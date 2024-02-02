@@ -126,7 +126,7 @@ public:
 
     void routingIO2Downloader(IOMUX_Channel ch);
 
-    void routingMicphoneChannel(MIC_Channel ch);
+    void routingMicrophoneChannel(MIC_Channel ch);
 
     void routingSpeakerChannel(SPK_Channel ch);
 
@@ -178,6 +178,8 @@ public:
     bool isChargeDone();
 
     bool isCharging();
+
+    void deviceScan(Stream *stream);
 
 private:
 

@@ -26,7 +26,7 @@ getVersion	KEYWORD2
 getOLEDAddress	KEYWORD2
 getBandDefinition	KEYWORD2
 routingIO2Downloader	KEYWORD2
-routingMicphoneChannel	KEYWORD2
+routingMicrophoneChannel	KEYWORD2
 routingSpeakerChannel	KEYWORD2
 saveConfigure	KEYWORD2
 enableBeep	KEYWORD2

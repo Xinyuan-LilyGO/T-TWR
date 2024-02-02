@@ -71,14 +71,14 @@ bool SA868::factoryNVS()
     this->pdat.emphasis  = 1;
     this->pdat.highPass  = 1;
     this->pdat.lowPass   = 1;
-    this->pdat.txPower     = 0;
+    this->pdat.txPower     = 1;
     this->pdat.bandwidth = 12500;
 
     size_t write = prefs.putBytes(SQL_KEY, &(this->pdat), sizeof(this->pdat));
     if (write != sizeof(this->pdat)) {
         log_e("Write database failed!"); return false;
     } else {
-        log_i("Write database successed!");
+        log_i("Write database succeeded!");
     }
     return true;
 }
@@ -168,7 +168,7 @@ bool SA868::saveConfigure()
         log_e("Write database failed!");
         return false;
     } else {
-        log_i("Write database successed!");
+        log_i("Write database succeeded!");
         return true;
     }
 }
