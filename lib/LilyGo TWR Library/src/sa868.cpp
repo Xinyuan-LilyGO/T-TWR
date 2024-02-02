@@ -142,6 +142,14 @@ bool SA868::begin(Stream &serial, enum RadioType type)
         factoryNVS();
 
     }
+
+    if (type != SA8X8_UNKONW) {
+        if (this->pdat.type != type) {
+            factoryNVS();
+        }
+    }
+
+
     log_i("RadioType:%s", this->pdat.type == SA8X8_UHF ? "UHF" : this->pdat.type == SA8X8_VHF ? "VHF" : "UNKONW");
     log_i("TransFreq:%lu", this->pdat.transFreq);
     log_i("RecvFreq :%lu", this->pdat.recvFreq);
