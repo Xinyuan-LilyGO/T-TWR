@@ -56,12 +56,12 @@ examples/
     | CPU Frequency                        | 240MHZ(WiFi)                      |
     | Core Debug Level                     | None                              |
     | USB DFU On Boot                      | Disable                           |
-    | Erase All Flash Before Sketch Upload | Disbale                           |
+    | Erase All Flash Before Sketch Upload | Disable                           |
     | Events Run On                        | Core1                             |
     | Flash Mode                           | QIO 80MHZ                         |
     | Flash Size                           | **16MB(128Mb)**                   |
     | Arduino Runs On                      | Core1                             |
-    | USB Firmware MSC On Boot             | Disbale                           |
+    | USB Firmware MSC On Boot             | Disable                           |
     | Partition Scheme                     | **16M Flash(3M APP/9.9MB FATFS)** |
     | PSRAM                                | **OPI PSRAM**                     |
     | Upload Mode                          | **UART0/Hardware CDC**            |
@@ -163,16 +163,19 @@ examples/
 8. TWR currently has two modes before leaving the factory, one is flashed with regular firmware and uses the esp built-in boot, and the other uses TinyUF2 as the boot program. For novices, please [see here](./firmware/README.MD)
 
 9.  How to enter TinyUF2 boot mode?
+
+      <img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/ham-1.jpg" width="400"><br>
+
       <details>
       <summary>
       Click to view detailed steps
       </summary>
-       * Before entering TinyUF2, the boot program must have been flashed. If it has not been written, [please see here](./firmware/README.MD)
-       * Press the RST button
-       * After pressing the RST button for one second, press the BOOT button. The disk will be ejected on the computer.
-       * At this time, drag the firmware with the suffix uf2 into the disk to upgrade the device.
+       1. Before entering TinyUF2, the boot program must have been flashed. If it has not been written, please see here https://github.com/Xinyuan-LilyGO/T-TWR/blob/master/firmware/README.MD <br>
+       2. Press the RST button<br>
+       3. After pressing the RST button for one second, press the BOOT button. The disk will be ejected on the computer.<br>
+       4. At this time, drag the firmware with the suffix uf2 into the disk to upgrade the device.<br>
       </details>
-10. ⚠ **There is a microphone port on the bottom of the board, do I need to install a microphone? Only for Rev2.0, Rev2.1 has removed the external microphone interface**
+11. ⚠ **There is a microphone port on the bottom of the board, do I need to install a microphone? Only for Rev2.0, Rev2.1 has removed the external microphone interface**
       <details>
       <summary>
       Click to view detailed steps
