@@ -171,7 +171,7 @@ const char cxcss[][5] = {
 #define __VHF_FREQ_RANGE        (40)
 
 enum RadioType {
-    SA8X8_UNKONW,
+    SA8X8_UNKNOW,
     SA8X8_UHF,
     SA8X8_VHF,
 };
@@ -330,7 +330,7 @@ public:
 
     bool checkFreq(uint32_t freq);
 
-    const struct sa868_data getSettting()
+    const struct sa868_data getStetting()
     {
         lock();
         struct sa868_data tmp = pdat;

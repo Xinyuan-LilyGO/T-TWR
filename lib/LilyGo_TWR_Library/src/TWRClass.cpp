@@ -5,31 +5,32 @@
  * @copyright Copyright (c) 2024  Shenzhen Xin Yuan Electronic Technology Co., Ltd
  * @date      2024-01-02
  * @note
- * @note    Power Domain
- *          ! Rev 2.1
- *          | DC1   | ESP + OLED + PIXEL         | 3.3V |
- *          | DC3   | Unuse                      | 3.3V |
- *          | DC5   | Unuse                      | -    |
- *          | ALDO1 | Unuse                      | -    |
- *          | ALDO2 | TF Card                    | 3.3V |
- *          | ALDO3 | Audio amplification switch | 3.3V |
- *          | ALOD4 | GPS                        | 3.3V |
- *          | BLDO1 | Microphone                 | 3.3V |
- *          | BLDO2 | Radio                      | 3.3V |
- *          | DLDO1 | Dowerloader                | 3.3V |
+ * @note     Power Domain
+ *           |       |         ! Rev 2.1          |      |
+ *           | ----- | -------------------------- | ---- |
+ *           | DC1   | ESP + OLED + PIXEL         | 3.3V |
+ *           | DC3   | Unused                     | 3.3V |
+ *           | DC5   | Unused                     | -    |
+ *           | ALDO1 | Unused                     | -    |
+ *           | ALDO2 | TF Card                    | 3.3V |
+ *           | ALDO3 | Audio amplification switch | 3.3V |
+ *           | ALOD4 | GPS                        | 3.3V |
+ *           | BLDO1 | Microphone                 | 3.3V |
+ *           | BLDO2 | Unused                     | -    |
+ *           | DLDO1 | Downloader                 | 3.3V |
  *
- *          ! Rev 2.0
- *          | DC1   | ESP + OLED                 | 3.3V |
- *          | DC3   | Radio  + PIXEL             | 3.4V |
- *          | DC5   | Unuse                      | -    |
- *          | ALDO1 | Unuse                      | -    |
- *          | ALDO2 | TF Card                    | 3.3V |
- *          | ALDO3 | Unuse                      | 3.3V |
- *          | ALOD4 | GPS                        | 3.3V |
- *          | BLDO1 | Microphone                 | 3.3V |
- *          | BLDO2 | Unuse                      | -    |
- *          | DLDO1 | Unuse                      | -    |
- *
+ *           |       |        ! Rev 2.0           |      |
+ *           | ----- | --------------             | ---- |
+ *           | DC1   | ESP + OLED                 | 3.3V |
+ *           | DC3   | Radio  + PIXEL             | 3.4V |
+ *           | DC5   | Unused                     | -    |
+ *           | ALDO1 | Unused                     | -    |
+ *           | ALDO2 | TF Card                    | 3.3V |
+ *           | ALDO3 | Unused                     | 3.3V |
+ *           | ALOD4 | GPS                        | 3.3V |
+ *           | BLDO1 | Microphone                 | 3.3V |
+ *           | BLDO2 | Unused                     | -    |
+ *           | DLDO1 | Unused                     | -    |
  */
 #include <SPI.h>
 #include "TWRClass.h"
@@ -146,6 +147,57 @@ void TWRClass::deviceScan(Stream *stream)
             stream->println("Done\n");
         }
     }
+}
+
+void TWRClass::sleep()
+{
+
+    detachInterrupt(PMU_IRQ);
+
+    disableGPS();
+
+    disableSD();
+
+    disableDownloadSwitch();
+
+    disableMicrophone();
+
+    setChargingLedMode(XPOWERS_CHG_LED_OFF);
+
+    RadioSerial.end();
+    Wire.end();
+    SPI.end();
+
+    pinMode(GNSS_RX_PIN, OPEN_DRAIN);
+    pinMode(GNSS_TX_PIN, OPEN_DRAIN);
+    pinMode(SA868_RX_PIN, OPEN_DRAIN);
+    pinMode(SA868_TX_PIN, OPEN_DRAIN);
+    pinMode(GNSS_PPS_PIN, OPEN_DRAIN);
+    pinMode(MIC_CTRL_PIN, OPEN_DRAIN);
+    pinMode(SA868_PD_PIN, OPEN_DRAIN);
+    pinMode(I2C_SDA, OPEN_DRAIN);
+    pinMode(I2C_SCL, OPEN_DRAIN);
+    pinMode(PMU_IRQ, OPEN_DRAIN);
+
+    pinMode(SPI_MOSI, OPEN_DRAIN);
+    pinMode(SPI_MISO, OPEN_DRAIN);
+    pinMode(SPI_SCK, OPEN_DRAIN);
+    pinMode(SD_CS, OPEN_DRAIN);
+    pinMode(ESP2SA868_MIC, OPEN_DRAIN);
+    pinMode(SA8682ESP_AUDIO, OPEN_DRAIN);
+
+    pinMode(ENCODER_A_PIN, OPEN_DRAIN);
+    pinMode(ENCODER_B_PIN, OPEN_DRAIN);
+
+
+    if (_version == TWR_REV2V1 ) {
+        pinMode(ESP32_PWM_TONE, OPEN_DRAIN);
+        pinMode(ESP_MIC_ADC, OPEN_DRAIN);
+        pinMode(SA868_SQL, OPEN_DRAIN);
+    } else {
+        pinMode(SA868_RF_PIN, OPEN_DRAIN);
+    }
+
 }
 
 
@@ -381,7 +433,7 @@ void  TWRClass::enableRadio()
         enableDC3();
         break;
     case TWR_REV2V1:
-        enableBLDO2();
+        // enableBLDO2();
         break;
     default:
         break;
@@ -395,7 +447,7 @@ void  TWRClass::disableRadio()
         disableDC3();
         break;
     case TWR_REV2V1:
-        disableBLDO2();
+        // disableBLDO2();
         break;
     default:
         break;
@@ -541,7 +593,7 @@ bool TWRClass::beginPower()
 
     disableBLDO1(); //Rev2.x Microphone LDO
     disableDC3();   //Rev2.0 SA8x8  DC boost , Rev2.1 user LDO
-    disableBLDO2(); //Rev2.1 SA8x8  DC boost , Rev2.0 user LDO
+    disableBLDO2(); //Rev2.1 User LDO
     disableALDO2(); //Rev2.x SD Card LDO
     disableALDO3(); //Rev2.1 Audio amplification switch ， Rev2.0 user LDO
     disableALDO4(); //Rev2.x GPS LDO

@@ -51,7 +51,7 @@
 #define ESP2SA868_MIC   (18)
 #define SA8682ESP_AUDIO (1)
 
-// Rev2.0 
+// Rev2.0
 #define SA868_RF_PIN    (38)
 
 

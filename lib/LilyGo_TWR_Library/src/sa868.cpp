@@ -122,7 +122,7 @@ bool SA868::begin(Stream &serial, enum RadioType type)
     }
 
     // For Rev2.0 the BAND is obtained from NVS
-    if (type != SA8X8_UNKONW) {
+    if (type != SA8X8_UNKNOW) {
         this->pdat.type = type;
     }
 
@@ -135,7 +135,7 @@ bool SA868::begin(Stream &serial, enum RadioType type)
     if (schLen == 0) { // simple check that data fits
 
         // For Rev2.0, it is impossible to detect which type it belongs to, the default is UHF
-        if (type == SA8X8_UNKONW) {
+        if (type == SA8X8_UNKNOW) {
             this->pdat.type = SA8X8_UHF;
         }
 
@@ -143,7 +143,7 @@ bool SA868::begin(Stream &serial, enum RadioType type)
 
     }
 
-    if (type != SA8X8_UNKONW) {
+    if (type != SA8X8_UNKNOW) {
         if (this->pdat.type != type) {
             factoryNVS();
         }

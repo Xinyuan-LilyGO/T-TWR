@@ -181,6 +181,9 @@ public:
 
     void deviceScan(Stream *stream);
 
+
+    void sleep();
+
 private:
 
     static void setFlag();
