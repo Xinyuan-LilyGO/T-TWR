@@ -41,7 +41,7 @@ enum Button {
     Unknown
 };
 
-#define DECLARE_DEMO(function)      void function(uint8_t menuSelec)
+#define DECLARE_DEMO(function)      void function(uint8_t menuSelect)
 #define U8G2_HOR_ALIGN_CENTER(t)    ((u8g2.getDisplayWidth() - (u8g2.getUTF8Width(t))) / 2)
 #define U8G2_HOR_ALIGN_RIGHT(t)     (u8g2.getDisplayWidth()  -  u8g2.getUTF8Width(t))
 
@@ -77,7 +77,7 @@ struct demo_struct {
     const char      *demo_item;
     const char      *demo_description;
     const uint8_t   demo_icon[32];
-    void            (*demo_func)(uint8_t menuSelec);
+    void            (*demo_func)(uint8_t menuSelect);
 } demo [] = {
     //* {
     //*         Title,
@@ -254,7 +254,7 @@ void setupWeb()
     server.begin();
 }
 
-void setRotory(uint32_t cur, uint32_t min, uint32_t max, uint32_t steps)
+void setRotaryValue(uint32_t cur, uint32_t min, uint32_t max, uint32_t steps)
 {
     static RotarySetting rSetting = {0};
     rSetting.cur = cur;
@@ -290,7 +290,7 @@ void rotaryTask(void *p)
                 if (pos != 0) {
                     pos -= setting.steps;
                 }
-                DBG("Dowm");
+                DBG("Down");
             }
             if (pos <= setting.min) {
                 pos = setting.min;
@@ -432,7 +432,7 @@ void setupOLED(uint8_t addr)
 
 void setup()
 {
-    bool rlst = false;
+    bool rslt = false;
 
 #ifdef DEBUG_PORT
     DEBUG_PORT.begin(115200);
@@ -447,12 +447,12 @@ void setup()
     //* If GPIO2 has been externally connected to other devices, the automatic detection may not work properly.
     //* Please initialize with the version specified below.
     //* Rev2.1 is not affected by GPIO2 because GPIO2 is not exposed in Rev2.1
-    rlst = twr.begin();
+    rslt = twr.begin();
 
     //* If GPIO2 is already connected to other devices, please initialize it with the specified version.
-    //rlst =  twr.begin(LILYGO_TWR_REV2_0);
+    //rslt =  twr.begin(LILYGO_TWR_REV2_0);
 
-    while (!rlst) {
+    while (!rslt) {
         DBG("PMU communication failed..");
         delay(1000);
     }
@@ -471,7 +471,7 @@ void setup()
 
         //* Initialize SA868
         radio.setPins(SA868_PTT_PIN, SA868_PD_PIN);
-        rlst = radio.begin(RadioSerial, twr.getBandDefinition());
+        rslt = radio.begin(RadioSerial, twr.getBandDefinition());
 
     } else {
 
@@ -482,17 +482,17 @@ void setup()
         radio.setPins(SA868_PTT_PIN, SA868_PD_PIN, SA868_RF_PIN);
 
         //* Designated as UHF
-        //  rlst = radio.begin(RadioSerial, SA8X8_UHF);
+        //  rslt = radio.begin(RadioSerial, SA8X8_UHF);
 
         //* Designated as VHF
-        // rlst = radio.begin(RadioSerial, SA8X8_VHF);
+        // rslt = radio.begin(RadioSerial, SA8X8_VHF);
 
         // If BAND is not specified, the default BAND is used, set through the menu.
-        rlst = radio.begin(RadioSerial, SA8X8_UNKONW);
+        rslt = radio.begin(RadioSerial, SA8X8_UNKNOW);
     }
 
     // If the display does not exist, it will block here
-    while (!rlst) {
+    while (!rslt) {
         DBG("SA8x8 communication failed, please use ATDebug to check whether the module responds normally..");
         strip.setPixelColor(0, strip.Color(255, 0, 0));
         strip.show();
@@ -570,14 +570,32 @@ void setup()
 
 void loop()
 {
-    static uint8_t menuSelec     = 0;
-    static uint8_t prevMenuSelec = menuSelec;
+    static uint8_t menuSelect     = 0;
+    static uint8_t prevMenuSelect = menuSelect;
     Button btnPressed;
 
     inMenu = true;
     do {
         btnPressed = readButton();
         printMain();
+
+        // DeepSleep test , About 900uA
+        if (btnPressed == LongPress) {
+            DBG("DeepSleep....");
+            printDeepSleep();
+
+            strip.clear();
+            strip.show();
+
+            radio.sleep();
+
+            twr.sleep();
+
+            esp_sleep_enable_ext1_wakeup(_BV(BUTTON_PTT_PIN), ESP_EXT1_WAKEUP_ALL_LOW);
+
+            esp_deep_sleep_start();
+        }
+
     } while ( btnPressed != ShortPress );
 
     inMenu = false;
@@ -589,30 +607,30 @@ void loop()
 
     while (1) {
         do {
-            menuSelec  = readRotary(lastItem, 0, itemsMENU - 1);
+            menuSelect  = readRotary(lastItem, 0, itemsMENU - 1);
             btnPressed = readButton();
             if (btnPressed == LongPress) {
-                menuSelec = 0;
+                menuSelect = 0;
                 break;
             }
-            if ( menuSelec != prevMenuSelec ) {
-                prevMenuSelec = menuSelec;
+            if ( menuSelect != prevMenuSelect ) {
+                prevMenuSelect = menuSelect;
                 beep();
             }
-            printMenu(menuSelec);
+            printMenu(menuSelect);
 
         } while ( btnPressed != ShortPress );
 
         beep();
 
         if (btnPressed == ShortPress) {
-            demo[menuSelec].demo_func(menuSelec);
-            lastItem = menuSelec;
+            demo[menuSelect].demo_func(menuSelect);
+            lastItem = menuSelect;
         } else {
             break;
         }
     }
-    menuSelec = 0;
+    menuSelect = 0;
     if (twr.isEnableBeep()) {
         twr.routingSpeakerChannel(TWRClass::TWR_RADIO_TO_SPK);
     }
@@ -634,6 +652,25 @@ void printPowerOFF()
         delay(8);
     } while (b >= 0);
     twr.shutdown();
+}
+
+void printDeepSleep()
+{
+    int b = twr.pdat.dispBrightness;
+    do {
+        u8g2.firstPage();
+        do {
+            u8g2.setFont(u8g2_font_tenstamps_mu);
+            u8g2.drawXBM(40, 0, 48, 48, xbmOFF);
+            u8g2.setCursor(32, 59);
+            u8g2.print("SLEEP");
+            u8g2.setContrast(b);
+        } while ( u8g2.nextPage() );
+        b -= 10;
+        delay(8);
+    } while (b >= 0);
+
+    u8g2.setPowerSave(true);
 }
 
 void printMain()
@@ -738,8 +775,8 @@ void printMain()
             u8g2.drawGlyph(5 + (4 * i), 12, 0x007c);
         }
 
-        float transFreq = radio.getSettting().transFreq / 1000000.0;
-        float recvFreq  = radio.getSettting().recvFreq / 1000000.0;
+        float transFreq = radio.getStetting().transFreq / 1000000.0;
+        float recvFreq  = radio.getStetting().recvFreq / 1000000.0;
 
         // Draw Freq
         u8g2.setFont(u8g2_font_pxplusibmvga8_mr    );
@@ -757,16 +794,16 @@ void printMain()
     } while ( u8g2.nextPage() );
 }
 
-void printMenu( uint8_t menuSelec )
+void printMenu( uint8_t menuSelect )
 {
     u8g2.firstPage();
     do {
         //ROW 1:
-        if ( menuSelec > 0 ) {
+        if ( menuSelect > 0 ) {
             u8g2.drawXBMP(4, 2,  14, 14, xMenuUp);
             u8g2.setFont(u8g2_font_haxrcorp4089_tr);
             u8g2.setCursor(22, 13);
-            u8g2.print(demo[menuSelec - 1].demo_item);
+            u8g2.print(demo[menuSelect - 1].demo_item);
 
         }
         //ROW 2:
@@ -774,29 +811,29 @@ void printMenu( uint8_t menuSelec )
         u8g2.drawBox(0, 18, 128, 27);
 
         u8g2.setColorIndex(0);
-        u8g2.drawXBMP(3, 24, 16, 16, demo[menuSelec].demo_icon);
+        u8g2.drawXBMP(3, 24, 16, 16, demo[menuSelect].demo_icon);
 
-        if ( strlen(demo[menuSelec].demo_description) == 0 ) {
-            u8g2.drawStr(22, 35, demo[menuSelec].demo_item);
+        if ( strlen(demo[menuSelect].demo_description) == 0 ) {
+            u8g2.drawStr(22, 35, demo[menuSelect].demo_item);
         } else {
-            u8g2.drawStr(22, 30, demo[menuSelec].demo_item);
+            u8g2.drawStr(22, 30, demo[menuSelect].demo_item);
             u8g2.setFont(u8g2_font_micro_mr);
-            u8g2.drawStr(22, 40, demo[menuSelec].demo_description);
+            u8g2.drawStr(22, 40, demo[menuSelect].demo_description);
         }
 
         //ROW 3:
         u8g2.setColorIndex(1);
-        if ( menuSelec < itemsMENU - 1 ) {
+        if ( menuSelect < itemsMENU - 1 ) {
             u8g2.drawXBMP(4, 48, 14, 14, xMenuDown);
             u8g2.setFont(u8g2_font_haxrcorp4089_tr);
             u8g2.setCursor(22, 58);
-            u8g2.print(demo[menuSelec + 1].demo_item);
+            u8g2.print(demo[menuSelect + 1].demo_item);
         }
         drawFrame();
     } while ( u8g2.nextPage() );
 }
 
-void demoLed( uint8_t menuSelec )
+void demoLed( uint8_t menuSelect )
 {
     int prevValue = 0;
     int value = strip.getBrightness();
@@ -819,7 +856,7 @@ void demoLed( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.drawFrame(13, 30, 102, 12);
             u8g2.drawFrame(14, 31, 100, 10);
@@ -846,7 +883,7 @@ void demoLed( uint8_t menuSelec )
     strip.show();
 }
 
-void demoSpeaker( uint8_t menuSelec )
+void demoSpeaker( uint8_t menuSelect )
 {
     Button   btnPressed;
     uint32_t prevTime   = 0;
@@ -863,7 +900,7 @@ void demoSpeaker( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.drawFrame(13, 30, 102, 12);
             u8g2.drawFrame(14, 31, 100, 10);
@@ -894,7 +931,7 @@ void demoSpeaker( uint8_t menuSelec )
     }
 }
 
-void demoOled( uint8_t menuSelec )
+void demoOled( uint8_t menuSelect )
 {
     int prevValue = 0;
     int value = twr.pdat.dispBrightness;
@@ -912,7 +949,7 @@ void demoOled( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             u8g2.drawFrame(13, 30, 102, 12);
             u8g2.drawFrame(14, 31, 100, 10);
             uint32_t bar = map(value, 0, 250, 0, 100);
@@ -930,7 +967,7 @@ void demoOled( uint8_t menuSelec )
     SAVE_CONFIGURE(dispBrightness, value);
 }
 
-void demoButton( uint8_t menuSelec )
+void demoButton( uint8_t menuSelect )
 {
     static uint32_t  pressedCounter = 0;
     Button           btnPressed;
@@ -943,7 +980,7 @@ void demoButton( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
             u8g2.setCursor(14, 43);
@@ -956,7 +993,7 @@ void demoButton( uint8_t menuSelec )
     } while ( btnPressed != LongPress );
 }
 
-void demoAlarm(uint8_t menuSelec )
+void demoAlarm(uint8_t menuSelect )
 {
     Button   btnPressed;
     uint32_t prevTime   = 0;
@@ -974,7 +1011,7 @@ void demoAlarm(uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.drawFrame(13, 30, 102, 12);
             u8g2.drawFrame(14, 31, 100, 10);
@@ -1008,14 +1045,14 @@ void demoAlarm(uint8_t menuSelec )
     strip.show();
 }
 
-void demoMic( uint8_t menuSelec )
+void demoMic( uint8_t menuSelect )
 {
     Button     btnPressed;
     int8_t dataIn[128], dataOut[128];
 
 
     if (twr.getVersion() == TWRClass::TWR_REV2V0) {
-        drawError(menuSelec); return;
+        drawError(menuSelect); return;
     }
 
     twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_ESP);
@@ -1026,7 +1063,7 @@ void demoMic( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
 
             for (int i = 0; i < 128; i++) {                     //take 128 samples
@@ -1047,7 +1084,7 @@ void demoMic( uint8_t menuSelec )
     twr.routingMicrophoneChannel(TWRClass::TWR_MIC_TO_RADIO);
 }
 
-void demoSensor( uint8_t menuSelec )
+void demoSensor( uint8_t menuSelect )
 {
     float    humid = 0;
     float    pressure = 0;
@@ -1066,7 +1103,7 @@ void demoSensor( uint8_t menuSelec )
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
@@ -1095,7 +1132,7 @@ void demoSensor( uint8_t menuSelec )
     } while ( btnPressed != LongPress );
 }
 
-void demoGPS(uint8_t menuSelec)
+void demoGPS(uint8_t menuSelect)
 {
     Button btnPressed;
     uint8_t ledState = LOW;
@@ -1109,7 +1146,7 @@ void demoGPS(uint8_t menuSelec)
 
 #if ARDUINO_USB_CDC_ON_BOOT
         if (btnPressed == ShortPress) {
-            // Serial.println("enableNMEAOutSerial.....");
+            // DBG("enableNMEAOutSerial.....");
             enableNMEAOutSerial = !enableNMEAOutSerial;
         }
 #endif
@@ -1142,7 +1179,7 @@ void demoGPS(uint8_t menuSelec)
         do {
             const uint8_t offset = 10;
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setColorIndex(0);
             u8g2.setFont(u8g2_font_nokiafc22_tu);
@@ -1181,7 +1218,7 @@ void demoGPS(uint8_t menuSelec)
     strip.show();
 }
 
-void demoSDCard(uint8_t menuSelec)
+void demoSDCard(uint8_t menuSelect)
 {
     Button   btnPressed;
     uint32_t cardSize = 0;
@@ -1211,7 +1248,7 @@ void demoSDCard(uint8_t menuSelec)
             }
 
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
@@ -1240,7 +1277,7 @@ void demoSDCard(uint8_t menuSelec)
     } while ( btnPressed != LongPress );
 }
 
-void demoPMU(uint8_t menuSelec)
+void demoPMU(uint8_t menuSelect)
 {
     float    voltageUSB;
     float    voltageBattery;
@@ -1256,7 +1293,7 @@ void demoPMU(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
@@ -1285,7 +1322,7 @@ void demoPMU(uint8_t menuSelec)
     } while ( btnPressed != LongPress );
 }
 
-uint32_t demoFreqSetting(uint8_t menuSelec,
+uint32_t demoFreqSetting(uint8_t menuSelect,
                          bool tx,
                          uint32_t curFreq,
                          uint8_t option,
@@ -1297,9 +1334,9 @@ uint32_t demoFreqSetting(uint8_t menuSelec,
     Button btnPressed;
     uint32_t value = 0;
     uint32_t prevValue = 0;
-    uint32_t bandwidth = radio.getSettting().bandwidth ;
-    uint32_t  transFreq = tx ? radio.getSettting().transFreq : radio.getSettting().recvFreq;
-    uint32_t CXCSS = tx ? radio.getSettting().txCXCSS : radio.getSettting().rxCXCSS;
+    uint32_t bandwidth = radio.getStetting().bandwidth ;
+    uint32_t  transFreq = tx ? radio.getStetting().transFreq : radio.getStetting().recvFreq;
+    uint32_t CXCSS = tx ? radio.getStetting().txCXCSS : radio.getStetting().rxCXCSS;
     do {
         btnPressed = readButton();
         value = readRotary(curFreq, minOut, maxOut, steps);
@@ -1314,7 +1351,7 @@ uint32_t demoFreqSetting(uint8_t menuSelec,
         do {
 
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
@@ -1366,16 +1403,16 @@ uint32_t demoFreqSetting(uint8_t menuSelec,
     return  value ;
 }
 
-void setTransFreq(uint8_t menuSelec, bool tx)
+void setTransFreq(uint8_t menuSelect, bool tx)
 {
     Button btnPressed;
     uint32_t pos = 0;
     uint32_t prevPos = 0;
-    uint32_t minOut = radio.getSettting().minFreq;
-    uint32_t maxOut = radio.getSettting().maxFreq;
-    uint32_t transFreq = tx ? radio.getSettting().transFreq : radio.getSettting().recvFreq;
-    uint32_t bandwidth = radio.getSettting().bandwidth ;
-    uint32_t CXCSS = tx ? radio.getSettting().txCXCSS : radio.getSettting().rxCXCSS;
+    uint32_t minOut = radio.getStetting().minFreq;
+    uint32_t maxOut = radio.getStetting().maxFreq;
+    uint32_t transFreq = tx ? radio.getStetting().transFreq : radio.getStetting().recvFreq;
+    uint32_t bandwidth = radio.getStetting().bandwidth ;
+    uint32_t CXCSS = tx ? radio.getStetting().txCXCSS : radio.getStetting().rxCXCSS;
 
     do {
         btnPressed = readButton();
@@ -1389,7 +1426,7 @@ void setTransFreq(uint8_t menuSelec, bool tx)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
             switch (pos) {
@@ -1432,16 +1469,16 @@ void setTransFreq(uint8_t menuSelec, bool tx)
 
             switch (pos) {
             case 0:
-                minOut = radio.getSettting().minFreq;
-                maxOut = radio.getSettting().maxFreq;
-                steps = radio.getSettting().bandwidth ;
-                transFreq = tx ? radio.getSettting().transFreq : radio.getSettting().recvFreq;
+                minOut = radio.getStetting().minFreq;
+                maxOut = radio.getStetting().maxFreq;
+                steps = radio.getStetting().bandwidth ;
+                transFreq = tx ? radio.getStetting().transFreq : radio.getStetting().recvFreq;
                 break;
             case 1:
                 minOut = 12500;
                 maxOut = 25000;
                 steps =  12500;
-                bandwidth = radio.getSettting().bandwidth ;
+                bandwidth = radio.getStetting().bandwidth ;
                 cur = bandwidth;
                 break;
             case 2:
@@ -1454,7 +1491,7 @@ void setTransFreq(uint8_t menuSelec, bool tx)
                 break;
             }
 
-            uint32_t setValue = demoFreqSetting(menuSelec, tx, cur, pos, minOut, maxOut, steps);
+            uint32_t setValue = demoFreqSetting(menuSelect, tx, cur, pos, minOut, maxOut, steps);
             DBG("Set opt:", pos, "value:", setValue);
 
             switch (pos) {
@@ -1462,10 +1499,10 @@ void setTransFreq(uint8_t menuSelec, bool tx)
                 tx ? radio.setTxFreq(setValue) : radio.setRxFreq(setValue);
                 break;
             case 1:
-                if (radio.getSettting().bandwidth != setValue) {
+                if (radio.getStetting().bandwidth != setValue) {
                     radio.setBandWidth(setValue);
                     // Bandwidth change, reset frequency to the minimum frequency value
-                    tx ? radio.setTxFreq(radio.getSettting().minFreq) : radio.setRxFreq(radio.getSettting().minFreq);
+                    tx ? radio.setTxFreq(radio.getStetting().minFreq) : radio.setRxFreq(radio.getStetting().minFreq);
                 }
                 break;
             case 2:
@@ -1474,9 +1511,9 @@ void setTransFreq(uint8_t menuSelec, bool tx)
             default:
                 break;
             }
-            transFreq = tx ? radio.getSettting().transFreq : radio.getSettting().recvFreq;
-            bandwidth = radio.getSettting().bandwidth ;
-            CXCSS = tx ? radio.getSettting().txCXCSS : radio.getSettting().rxCXCSS;
+            transFreq = tx ? radio.getStetting().transFreq : radio.getStetting().recvFreq;
+            bandwidth = radio.getStetting().bandwidth ;
+            CXCSS = tx ? radio.getStetting().txCXCSS : radio.getStetting().rxCXCSS;
         }
 
     } while ( btnPressed != LongPress );
@@ -1484,19 +1521,19 @@ void setTransFreq(uint8_t menuSelec, bool tx)
     radio.saveConfigure();
 }
 
-void demoTransFreq(uint8_t menuSelec)
+void demoTransFreq(uint8_t menuSelect)
 {
-    setTransFreq(menuSelec, true);
+    setTransFreq(menuSelect, true);
 }
 
-void demoRecvFreq(uint8_t menuSelec)
+void demoRecvFreq(uint8_t menuSelect)
 {
-    setTransFreq(menuSelec, false);
+    setTransFreq(menuSelect, false);
 }
 
-void demoSquelchLevel(uint8_t menuSelec)
+void demoSquelchLevel(uint8_t menuSelect)
 {
-    int    value        = radio.getSettting().SQ;
+    int    value        = radio.getStetting().SQ;
     int    prevSQ       = value;
     Button btnPressed;
     do {
@@ -1511,7 +1548,7 @@ void demoSquelchLevel(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.drawFrame(13, 30, 102, 12);
             u8g2.drawFrame(14, 31, 100, 10);
@@ -1535,17 +1572,17 @@ void demoSquelchLevel(uint8_t menuSelec)
     radio.saveConfigure();
 }
 
-void demoPowerLevel(uint8_t menuSelec)
+void demoPowerLevel(uint8_t menuSelect)
 {
     Button btnPressed;
-    int value = radio.getSettting().txPower;
+    int value = radio.getStetting().txPower;
     do {
         value           = readRotary(value, 0, 1);
         btnPressed      = readButton();
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             u8g2.setFont(u8g2_font_nokiafc22_tu);
             u8g2.setCursor(45, 31);
@@ -1571,7 +1608,7 @@ void demoPowerLevel(uint8_t menuSelec)
         if (btnPressed == ShortPress) {
             beep();
             value ? radio.lowPower() : radio.highPower();
-            value = radio.getSettting().txPower;
+            value = radio.getStetting().txPower;
         }
 
     } while ( btnPressed != LongPress );
@@ -1579,14 +1616,14 @@ void demoPowerLevel(uint8_t menuSelec)
     radio.saveConfigure();
 }
 
-void demoFilter(uint8_t menuSelec)
+void demoFilter(uint8_t menuSelect)
 {
     Button btnPressed;
     int value = 0;
     int prevValue = 0;
-    bool  emphasis = radio.getSettting().emphasis;
-    bool  highPass = radio.getSettting().highPass;
-    bool  lowPass = radio.getSettting().lowPass;
+    bool  emphasis = radio.getStetting().emphasis;
+    bool  highPass = radio.getStetting().highPass;
+    bool  lowPass = radio.getStetting().lowPass;
 
     do {
         value       = readRotary(0, 0, 2);
@@ -1595,7 +1632,7 @@ void demoFilter(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             if (prevValue != value) {
                 prevValue = value;
@@ -1664,16 +1701,16 @@ void demoFilter(uint8_t menuSelec)
                 switch (value) {
                 case 0:
                     radio.enableEmpHassis(!emphasis);
-                    emphasis = radio.getSettting().emphasis;
+                    emphasis = radio.getStetting().emphasis;
                     break;
                 case 1:
                     radio.enableHighPass(!highPass);
-                    highPass = radio.getSettting().highPass;
+                    highPass = radio.getStetting().highPass;
                     break;
                 case 2:
                     u8g2.setCursor(14, 57);
                     radio.enableLowPass(!lowPass);
-                    lowPass = radio.getSettting().lowPass;
+                    lowPass = radio.getStetting().lowPass;
                     break;
                 default:
                     break;
@@ -1687,7 +1724,7 @@ void demoFilter(uint8_t menuSelec)
     radio.saveConfigure();
 }
 
-void demoBLE(uint8_t menuSelec)
+void demoBLE(uint8_t menuSelect)
 {
     Button btnPressed;
     int prevValue = 0;
@@ -1698,7 +1735,7 @@ void demoBLE(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             if (prevValue != value) {
                 prevValue = value;
                 beep();
@@ -1737,7 +1774,7 @@ void demoBLE(uint8_t menuSelec)
     SAVE_CONFIGURE(ble, value);
 }
 
-void demoWiFi(uint8_t menuSelec)
+void demoWiFi(uint8_t menuSelect)
 {
     Button btnPressed;
     int prevValue = 0;
@@ -1748,7 +1785,7 @@ void demoWiFi(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             if (prevValue != value) {
                 prevValue = value;
                 beep();
@@ -1804,7 +1841,7 @@ void demoWiFi(uint8_t menuSelec)
     SAVE_CONFIGURE(wifi, value);
 }
 
-void demoSetting(uint8_t menuSelec)
+void demoSetting(uint8_t menuSelect)
 {
     Button btnPressed;
     int value = 0;
@@ -1812,7 +1849,7 @@ void demoSetting(uint8_t menuSelec)
     bool  beep = twr.getSetting().beep;
 
     if (twr.getVersion() == TWRClass::TWR_REV2V0) {
-        drawError(menuSelec); return;
+        drawError(menuSelect); return;
     }
 
     do {
@@ -1822,7 +1859,7 @@ void demoSetting(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
 
             if (prevValue != value) {
                 prevValue = value;
@@ -1873,10 +1910,10 @@ void demoSetting(uint8_t menuSelec)
 
 }
 
-void demoDevInfo(uint8_t menuSelec)
+void demoDevInfo(uint8_t menuSelect)
 {
     Button btnPressed;
-    RadioType  type = radio.getSettting().type;
+    RadioType  type = radio.getStetting().type;
     String  radioType = type == SA8X8_UHF ? "UHF" : "VHF";
     String fwType = radio.firmwareType();
     int value = type;
@@ -1889,7 +1926,7 @@ void demoDevInfo(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             u8g2.setFont(u8g2_font_nokiafc22_tu);
 
             u8g2.setCursor(14, 31);
@@ -1968,7 +2005,7 @@ uint32_t readRotary(uint32_t cur, uint32_t minOut, uint32_t maxOut, uint32_t ste
     static uint32_t readPotValue;
 
     if (lastMin != minOut || lastMax != maxOut || lastSteps != steps) {
-        setRotory(cur, minOut, maxOut, steps);
+        setRotaryValue(cur, minOut, maxOut, steps);
         lastMin = minOut;
         lastMax = maxOut;
         lastSteps = steps;
@@ -1984,7 +2021,7 @@ void drawFrame()
     u8g2.drawRFrame(0, 0, 128, 64, 5);
 }
 
-void drawHeader( uint8_t menuSelec )
+void drawHeader( uint8_t menuSelect )
 {
     u8g2.drawHLine(2, 1, 124);
     u8g2.drawHLine(1, 2, 126);
@@ -1992,9 +2029,9 @@ void drawHeader( uint8_t menuSelec )
     u8g2.drawBox(0, 4, 128, 14);
 
     u8g2.setColorIndex(0);
-    u8g2.drawXBMP(4, 1,  16, 16, demo[menuSelec].demo_icon);
+    u8g2.drawXBMP(4, 1,  16, 16, demo[menuSelect].demo_icon);
     u8g2.setFont(u8g2_font_nokiafc22_tu);
-    u8g2.drawStr(22, 12, demo[menuSelec].demo_item);
+    u8g2.drawStr(22, 12, demo[menuSelect].demo_item);
     u8g2.setColorIndex(1);
 }
 
@@ -2007,7 +2044,7 @@ void beep()
 }
 
 
-void drawError(uint8_t menuSelec)
+void drawError(uint8_t menuSelect)
 {
     Button     btnPressed;
     do {
@@ -2015,7 +2052,7 @@ void drawError(uint8_t menuSelec)
         u8g2.firstPage();
         do {
             drawFrame();
-            drawHeader(menuSelec);
+            drawHeader(menuSelect);
             u8g2.setFont(u8g2_font_nokiafc22_tu);
             u8g2.setCursor(14, 44);
             u8g2.print(F("REV2.0 NOT SUPPORT"));
