@@ -153,25 +153,25 @@ public:
     void selectIO2Radio(bool enable);
 
 
-    inline void  enableRadio();
+    void  enableRadio();
 
-    inline void  disableRadio();
+    void  disableRadio();
 
-    inline void enableGPS();
+    void enableGPS();
 
-    inline void disableGPS();
+    void disableGPS();
 
-    inline void enableSD();
+    void enableSD();
 
-    inline void disableSD();
+    void disableSD();
 
-    inline void enableDownloadSwitch();
+    void enableDownloadSwitch();
 
-    inline void disableDownloadSwitch();
+    void disableDownloadSwitch();
 
-    inline void enableMicrophone();
+    void enableMicrophone();
 
-    inline void disableMicrophone();
+    void disableMicrophone();
 
     void ledToggle();
 
