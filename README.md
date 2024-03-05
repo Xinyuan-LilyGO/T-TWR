@@ -1,5 +1,9 @@
 <h1 align = "center">🌟 LILYGO T-TWR 🌟</h1>
 
+
+[![Arduino_CI](https://github.com/Xinyuan-LilyGO/T-TWR/actions/workflows/arduino_ci.yml/badge.svg)](https://github.com/Xinyuan-LilyGO/T-TWR/actions/workflows/arduino_ci.yml)
+[![Build PlatformIO](https://github.com/Xinyuan-LilyGO/T-TWR/actions/workflows/pio.yml/badge.svg)](https://github.com/Xinyuan-LilyGO/T-TWR/actions/workflows/pio.yml)
+
 ## 1️⃣Support Product
 
 | Product(PinMap)   | SOC        | Flash | PSRAM    |
