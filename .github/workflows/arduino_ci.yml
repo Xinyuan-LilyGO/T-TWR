@@ -1,0 +1,56 @@
+name: Arduino_CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    paths:
+      - "examples/**"
+      - "src/**"
+      - ".github/workflows/arduino_ci.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        examples:
+          - examples/Factory/Factory.ino
+          - examples/GPS_Basic_Example/GPS_Basic_Example.ino
+          - examples/GPS_Full_Example/GPS_Full_Example.ino
+          - examples/Pixels_RGBWstrandtest/Pixels_RGBWstrandtest.ino
+          - examples/Pixels_Strandtest_Example/Pixels_Strandtest_Example.ino
+          - examples/SA868_ATDebug_Example/SA868_ATDebug_Example.ino
+          - examples/SA868_ESPSendAudio_Example/SA868_ESPSendAudio_Example.ino
+          - examples/SD_Test_Example/SD_Test_Example.ino
+          - examples/SD_Time_Example/SD_Time_Example.ino
+          - examples/TFT_ArcFill_Example/TFT_ArcFill_Example.ino
+          - examples/TFT_Keypad_240x320_Example/TFT_Keypad_240x320_Example.ino
+          - examples/U8g2_FontUsage_Example/U8g2_FontUsage_Example.ino
+          - examples/U8g2_GraphicsTest_Example/U8g2_GraphicsTest_Example.ino
+          - examples/U8g2_UpdateArea_Example/U8g2_UpdateArea_Example.ino
+          - examples/WAV_Player/WAV_Player.ino
+
+    env:
+      EXAMPLES: ${{matrix.examples}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Arduino Ci
+        run: |
+          wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz -O arduino-cli.tar.gz ;
+          sudo tar xf arduino-cli.tar.gz -C /usr/local/bin arduino-cli ;
+          arduino-cli config init ;
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json ;
+          arduino-cli core update-index ;
+          arduino-cli core install esp32:esp32@2.0.14 ;
+
+      - name: Build examples
+        run: |
+          cd $GITHUB_WORKSPACE ;
+          mkdir -p $HOME/Arduino/libraries
+          cp -r $PWD/lib/* $HOME/Arduino/libraries
+
+          cd $GITHUB_WORKSPACE ;
+          arduino-cli compile -besp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=app3M_fat9M_16MB,PSRAM=opi --library . $PWD/$EXAMPLES ;
