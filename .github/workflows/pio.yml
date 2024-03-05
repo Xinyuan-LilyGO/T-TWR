@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example: 
+        example:
           - examples/Factory
           - examples/GPS_Basic_Example
           - examples/GPS_Full_Example
@@ -30,7 +30,7 @@ jobs:
           - examples/U8g2_FontUsage_Example
           - examples/U8g2_GraphicsTest_Example
           - examples/U8g2_UpdateArea_Example
-          
+          - examples/WAV_Player
 
     steps:
       - uses: actions/checkout@v3

@@ -23,6 +23,7 @@ examples/
 ├── SA868_ESPSendAudio_Example      # Radio frequency sends ESP32 signal
 ├── SD_Test_Example                 # SD Test Example
 ├── SD_Time_Example                 # SD Time Example
+├── WAV_Player                      # WAV Player
 ├── TFT_ArcFill_Example             # Screen extension example
 ├── TFT_Keypad_240x320_Example      # Screen extension example
 ├── U8g2_FontUsage_Example          # Onboard OLED U8G2 example
