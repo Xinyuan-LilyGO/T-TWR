@@ -30,7 +30,7 @@
 #include "WebIndex.h"
 
 
-// #define DEBUG_PORT Serial    // Output debugging information
+#define DEBUG_PORT Serial    // Output debugging information
 #include "LilyGo_TWR.h"
 
 using namespace ace_button;
@@ -442,6 +442,12 @@ void setup()
     rotaryMsg = xQueueCreate(1, sizeof(uint32_t));
     rotarySetting = xQueueCreate(1, sizeof(RotarySetting));
 
+    // Initialize pixel lights
+    strip.setBrightness(50);
+    strip.begin();
+    strip.setPixelColor(0, strip.Color(0, 255, 0));
+    strip.show();
+
     //* Initializing PMU is related to other peripherals
     //* Automatically detect the revision version through GPIO detection.
     //* If GPIO2 has been externally connected to other devices, the automatic detection may not work properly.
@@ -457,11 +463,6 @@ void setup()
         delay(1000);
     }
 
-    // Initialize pixel lights
-    strip.setBrightness(twr.pdat.pixelBrightness);
-    strip.begin();
-    strip.clear();
-    strip.show();
 
     //* Rev2.1 uses OLED to determine whether it is VHF or UHF.
     //* Rev2.0 cannot determine by device address.By default, the 0X3C device address is used.
@@ -492,6 +493,19 @@ void setup()
     }
 
     // If the display does not exist, it will block here
+    uint8_t addr = twr.getOLEDAddress();
+    if ((addr != 0x3C || addr != 0x3D) && !rslt) {
+        // Initialize display
+        u8g2.setI2CAddress(addr << 1);
+        u8g2.begin();
+        u8g2.clearBuffer();
+        u8g2.setFont(u8g2_font_tenstamps_mu);
+        u8g2.setCursor(30, 28);
+        u8g2.print("SA8X8");
+        u8g2.setCursor(22, 52);
+        u8g2.print("FAILED");
+        u8g2.sendBuffer();
+    }
     while (!rslt) {
         DBG("SA8x8 communication failed, please use ATDebug to check whether the module responds normally..");
         strip.setPixelColor(0, strip.Color(255, 0, 0));
@@ -501,6 +515,10 @@ void setup()
         strip.show();
         delay(300);
     }
+
+    strip.setBrightness(twr.pdat.pixelBrightness);
+    strip.clear();
+    strip.show();
 
     // Initialize SD card
     if (setupSDCard()) {
@@ -530,7 +548,7 @@ void setup()
     setupBME280();
 
     // Initialize display
-    setupOLED(twr.getOLEDAddress());
+    setupOLED(addr);
 
     delay(3000);
 
@@ -579,7 +597,7 @@ void loop()
         btnPressed = readButton();
         printMain();
 
-        // DeepSleep test , About 900uA
+        // DeepSleep test , About ~660uA
         if (btnPressed == LongPress) {
             DBG("DeepSleep....");
             printDeepSleep();
