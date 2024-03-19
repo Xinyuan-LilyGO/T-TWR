@@ -151,8 +151,15 @@ void TWRClass::deviceScan(Stream *stream)
 
 void TWRClass::sleep()
 {
-
+    // Unregister PMU interrupt
     detachInterrupt(PMU_IRQ);
+
+    clearIrqStatus();
+
+    // Restore long press shutdown function
+    enablePowerOff(true);
+
+    disableRadio();
 
     disableGPS();
 
@@ -433,6 +440,7 @@ void  TWRClass::enableRadio()
         enableDC3();
         break;
     case TWR_REV2V1:
+        // There is a PD Pin(40) for control and the power cannot be turned off.
         // enableBLDO2();
         break;
     default:
@@ -447,6 +455,7 @@ void  TWRClass::disableRadio()
         disableDC3();
         break;
     case TWR_REV2V1:
+        // There is a PD Pin(40) for control and the power cannot be turned off.
         // disableBLDO2();
         break;
     default:

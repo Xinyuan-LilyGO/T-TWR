@@ -46,7 +46,7 @@ void SA868::setRadioType(RadioType type)
 
 bool SA868::factoryNVS()
 {
-    log_e("Data is not correct size!");
+    log_e("Data is not correct size! Set Radio Type : %d\n", this->pdat.type);
     switch (this->pdat.type) {
     case SA8X8_UHF:
         this->pdat.transFreq = DEFAULT_UHF_FREQ;
@@ -145,12 +145,13 @@ bool SA868::begin(Stream &serial, enum RadioType type)
 
     if (type != SA8X8_UNKNOW) {
         if (this->pdat.type != type) {
+            this->pdat.type = type;
             factoryNVS();
         }
     }
 
 
-    log_i("RadioType:%s", this->pdat.type == SA8X8_UHF ? "UHF" : this->pdat.type == SA8X8_VHF ? "VHF" : "UNKONW");
+    log_i("RadioType:%s", this->pdat.type == SA8X8_UHF ? "UHF" : this->pdat.type == SA8X8_VHF ? "VHF" : "UNKNOW");
     log_i("TransFreq:%lu", this->pdat.transFreq);
     log_i("RecvFreq :%lu", this->pdat.recvFreq);
     log_i("TX CXCSS :%u", this->pdat.txCXCSS);
