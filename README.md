@@ -12,8 +12,8 @@
 1. Rev2.1 has a microphone switching matrix, which can collect microphones to ESP32S3 for processing, but Rev2.0 does not have it.
 2. Rev2.1 has a speaker switching matrix, which can send audio signals to the power amplifier to play prompts, music, etc. through the switching matrix. Rev2.0 does not have it.
 3. Rev2.1 has an IO switching matrix, and SA8X8 can be programmed through the switching matrix. Rev2.0 does not have this feature. This feature was proposed by the OpenRTX team. The function is not yet implemented. Please pay attention to OpenRTX for the latest progress.
-4. Rev2.1 can obtain the current UHF or VHF through the OLED device address, but Rev2.0 does not.
-5. Rev2.1 can obtain whether SA8X8 is currently in the accepting state by monitoring IO2, but Rev2.0 does not.
+4. Rev2.1 can determine whether the device address is UHF or VHF through OLED, but Rev2.0 cannot.
+5. Rev2.1 can obtain whether the SA8X8 is currently in the receiving state by monitoring IO2, but Rev2.0 cannot..
 6. In Rev2.1, the PTT button is changed to the left side, which is closer to the real walkie-talkie operating habits, while in Rev2.0, it is on the right side.
 7. Rev2.1 changes the pixel light to the upper right to make it easier to monitor the status, Rev2.0 is on the side of the PCB
 8. Rev2.1 reserves the RF front-end matching circuit, which makes it easier to fine-tune the signal.
