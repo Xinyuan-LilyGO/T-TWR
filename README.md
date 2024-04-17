@@ -9,7 +9,7 @@
 
 #### There are the following differences between Rev2.1 and Rev2.0
 
-1. Rev2.1 has a microphone switching matrix, which can collect microphones to ESP32S3 for processing, but Rev2.0 does not have it.
+1. Rev2.1 has a microphone switching matrix that can collect microphone signals for processing by ESP32S3, but Rev2.0 does not.
 2. Rev2.1 has a speaker switching matrix, which can send audio signals to the power amplifier to play prompts, music, etc. through the switching matrix. Rev2.0 does not have it.
 3. Rev2.1 has an IO switching matrix, and SA8X8 can be programmed through the switching matrix. Rev2.0 does not have this feature. This feature was proposed by the OpenRTX team. The function is not yet implemented. Please pay attention to OpenRTX for the latest progress.
 4. Rev2.1 can determine whether the device address is UHF or VHF through OLED, but Rev2.0 cannot.
