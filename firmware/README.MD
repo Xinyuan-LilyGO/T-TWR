@@ -11,6 +11,7 @@
 | twr_Rev2.0_uhf.bin | [firmware](./twr_Rev2.0_uhf.bin) |
 | twr_Rev2.0_vhf.bin | [firmware](./twr_Rev2.0_vhf.bin) |
 | twr_Rev2.x.bin     | [firmware](./twr_Rev2.x.bin)     |
+| twr_gps_debug.bin  | [firmware](./twr_gps_debug.bin)  |
 
 ## How falsh *.bin file ?
 
@@ -25,6 +26,7 @@
 | twr_Rev2.0_uhf.uf2     | [firmware](./twr_Rev2.0_uhf.uf2)     |
 | twr_Rev2.0_vhf.uf2     | [firmware](./twr_Rev2.0_vhf.uf2)     |
 | twr_Rev2.x.uf2         | [firmware](./twr_Rev2.x.uf2)         |
+| twr_gps_debug.uf2      | [firmware](./twr_gps_debug.uf2)      |
 
 * To use TinyUF2, you need to burn tinyuf2_bootloader.bin first. After the burning is completed, a disk will pop up. Drag firmware.uf2 into the disk.
 
