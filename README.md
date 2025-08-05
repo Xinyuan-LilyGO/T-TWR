@@ -27,7 +27,7 @@
 | [T-TWR Rev2.1][2] | ESP32-S3R8 | 16MB  | 8MB(OPI) |
 
 [1]: https://www.lilygo.cc/products/t-twr-plus
-[2]: https://www.lilygo.cc/products/t-twr-plus
+[2]: https://www.lilygo.cc/products/t-twr-rev2-1
 
 ## 2️⃣Examples
 
